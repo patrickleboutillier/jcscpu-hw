@@ -46,6 +46,16 @@ module jadd(input wa, input wb, input wci, output wc, output wco) ;
 endmodule
 
 
+module jcmp(input wa, input wb, input weqi, input wali, output wc, output weqo, output walo) ;
+	wire w32, w45 ;
+	jxor xor1(wa, wb, wc) ;
+	jnot not1(wc, w23) ;
+	jand and1(weqi, w23, weqo) ;
+	jandN #(3) and3({weqi, wa, wc}, w45) ;
+	jor or1(wali, w45, walo) ;
+endmodule
+
+
 module jconn(input wa, output wb) ;
 	jand x(wa, wa, wb) ;
 endmodule
@@ -110,28 +120,6 @@ func (this *ORe) AddWire(w *Wire) {
 	NewCONN(w, this.orn.is.GetWire(this.n))
 	this.n++
 }
-
-/*
-ADD
-
-type ADD struct {
-	a, b, c, ci, co *Wire
-}
-
-func NewADD(wa *Wire, wb *Wire, wci *Wire, wc *Wire, wco *Wire) *ADD {
-	wi := NewWire()
-	wcoa := NewWire()
-	wcob := NewWire()
-	NewXOR(wa, wb, wi)
-	NewXOR(wi, wci, wc)
-	NewAND(wci, wi, wcoa)
-	NewAND(wa, wb, wcob)
-	NewOR(wcoa, wcob, wco)
-	return &ADD{wa, wb, wc, wci, wco}
-}
-
-/*
-CMP
 
 type CMP struct {
 	a, b, c, eqi, ali, eqo, alo *Wire
