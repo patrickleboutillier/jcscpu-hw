@@ -1,6 +1,6 @@
 # How to use the JCSCPU Basys-3 Demo
 
-The demo uses different modes to allow the user to try out the different components that build up the CPU. 
+The demo uses different modes to allow the user to try out the components that build up the JCS CPU. 
 
 ## Reference
 
