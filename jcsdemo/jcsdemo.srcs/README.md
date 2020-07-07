@@ -1,4 +1,4 @@
-# How to use the JSCCPU Basys-3 Demo
+# How to use the JCSCPU Basys-3 Demo
 
 The demo uses different modes to allow the user to try out the different components that build up the CPU. The following IO elements of the Basys-3 board are used in the demo:
 
