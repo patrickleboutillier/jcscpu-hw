@@ -52,10 +52,6 @@ module jcsdemo(
     end
 
     wire co, eqo, alo, zo ; 
-    assign co = r_led[15] ;
-    assign eqo = r_led[14] ;
-    assign alo = r_led[13] ;
-    assign zo = r_led[12] ;
     
     wire ci, eqi, ali ;
     assign ci = BTNL ;
@@ -85,6 +81,10 @@ module jcsdemo(
     // 5, xor
     wire xor_out ;
     jxor uxor(SW[1], SW[0], xor_out) ;
+
+    // 6, add
+    wire add_out, add_co ;
+    jadd uadd(SW[1], SW[0], ci, add_out, add_co) ;
                  
     always @(posedge CLK) begin
         case (mode)
@@ -111,6 +111,11 @@ module jcsdemo(
             5: begin
                 r_led[15:1] = 15'b0 ;
                 r_led[0] = xor_out ;
+            end
+            6: begin
+                r_led[14:1] = 14'b0 ;
+                r_led[0] = add_out ;
+                r_led[15] = add_co ;
             end
             default: begin
                 r_led[15:0] = 16'b0 ;
