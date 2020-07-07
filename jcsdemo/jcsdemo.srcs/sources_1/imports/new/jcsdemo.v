@@ -40,7 +40,10 @@ module jcsdemo(
 		modes[8] = "----" ;
 	end
 
+    // Each click moves to the next mode. The name of the mode os displayed on the 7SD.
     wire mbtn_click ;
+    click cmbtn(CLK, BTNU, mbtn_click) ;
+    seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(posedge CLK) begin
         if (mbtn_click) begin
         	mode = mode + 1 ;
@@ -51,12 +54,11 @@ module jcsdemo(
 		word = modes[mode] ;
     end
 
-    wire co, eqo, alo, zo ; 
-    
-    wire ci, eqi, ali ;
-    assign ci = BTNL ;
-    assign eqi = BTNC ;
-    assign ali = BTNR ;
+    // Aliases for push buttons
+    wire CI, EQI, ALI ;
+    assign CI = BTNL ;
+    assign EQI = BTNC ;
+    assign ALI = BTNR ;
          
     // 0, buf
     wire buf_out ;
@@ -84,9 +86,9 @@ module jcsdemo(
 
     // 6, add
     wire add_out, add_co ;
-    jadd uadd(SW[1], SW[0], ci, add_out, add_co) ;
+    jadd uadd(SW[1], SW[0], CI, add_out, add_co) ;
                  
-    always @(posedge CLK) begin
+    always @(*) begin
         case (mode)
             0: begin
                 r_led[15:1] = 15'b0 ;
@@ -123,8 +125,7 @@ module jcsdemo(
         endcase
     end
     
+    // Drive the LEDs (output results) from the r_led array. 
     assign LED[15:0] = r_led[15:0] ;
-    click cmbtn(CLK, BTNU, mbtn_click) ;
-    seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     
 endmodule
