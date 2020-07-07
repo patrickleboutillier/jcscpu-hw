@@ -46,7 +46,7 @@ endmodule
 
 
 module jcmp(input wa, input wb, input weqi, input wali, output wc, output weqo, output walo) ;
-	wire w32, w45 ;
+	wire w23, w45 ;
 	jxor xor1(wa, wb, wc) ;
 	jnot not1(wc, w23) ;
 	jand and1(weqi, w23, weqo) ;
