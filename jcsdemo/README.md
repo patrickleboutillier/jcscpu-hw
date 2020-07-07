@@ -8,7 +8,7 @@ The demo uses different modes to allow the user to try out the different compone
 
 The following IO elements of the Basys-3 board are used in the demo:
 
-### Seven Segment Display (#4)
+### Seven Segment Display (callout #4)
 The sevent segment display displays the current demo mode. Here is the lists of the demo modes:
 * buf
 * not
@@ -19,16 +19,16 @@ The sevent segment display displays the current demo mode. Here is the lists of 
 * add
 * cmp
 
-### Push buttons (#7)
+### Push buttons (callout #7)
 * _BTNU_: The top button is used to toggle between the different demo modes.
 * _BTNL_: When pressed, sets the "carry in" (_CI_) input to 1 for the various ALU components.
 * _BTNC_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various ALU components.
 * _BTNR_: When pressed, sets the "a-larger in" (_ALI_) input to 1 for the various ALU components.
 
-### Switches (_SW15_ through _SW0_) (#5)
+### Switches (_SW15_ through _SW0_) (callout #5)
 Switches are used to control the input bits to the various components.
 
-### LEDs (_LD15_ through _LD0_) (#6)
+### LEDs (_LD15_ through _LD0_) (callout #6)
 LEDs are used to indicate the output values for the various components.
 * _LD15_: "carry out" (_CO_) flag.
 * _LD14_: "equal out" (_EQO_) flag.
