@@ -21,7 +21,7 @@
 
 
 module jcsdemo(
-    input CLK, input [15:0] SW, input BTNC,
+    input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR,
     output [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
     reg [15:0] r_led = 16'b0 ;
@@ -29,16 +29,20 @@ module jcsdemo(
 	reg [31:0] modes[5:0] ;
     reg [31:0] word ;
 	initial begin
-		modes[0] = "nand" ;
+		modes[0] = " buf" ;
 		modes[1] = " not" ;
-		modes[2] = " buf" ;
+		modes[2] = "nand" ;
 		modes[3] = " and" ;
-		modes[4] = "----" ;
+		modes[4] = "  or" ;
+		modes[5] = " xor" ;
+		modes[6] = " add" ;
+		modes[7] = " cmp" ;
+		modes[8] = "----" ;
 	end
 
-    wire btnc_click ;
+    wire mbtn_click ;
     always @(posedge CLK) begin
-        if (btnc_click) begin
+        if (mbtn_click) begin
         	mode = mode + 1 ;
             if (modes[mode] == "----") begin
                 mode = 0 ;
@@ -47,27 +51,46 @@ module jcsdemo(
 		word = modes[mode] ;
     end
 
-    // 0, nand
-    wire nand_out ;
-    jnand unand(SW[1], SW[0], nand_out) ;
+    wire co, eqo, alo, zo ; 
+    assign co = r_led[15] ;
+    assign eqo = r_led[14] ;
+    assign alo = r_led[13] ;
+    assign zo = r_led[12] ;
+    
+    wire ci, eqi, ali ;
+    assign ci = BTNL ;
+    assign eqi = BTNC ;
+    assign ali = BTNR ;
+         
+    // 0, buf
+    wire buf_out ;
+    jbuf ubuf(SW[0], buf_out) ;
     
     // 1, not
     wire not_out ;
     jnot unot(SW[0], not_out) ;
- 
-    // 2, buf
-    wire buf_out ;
-    jbuf ubuf(SW[0], buf_out) ;
+
+    // 2, nand
+    wire nand_out ;
+    jnand unand(SW[1], SW[0], nand_out) ;
  
     // 3, and
     wire and_out ;
     jand uand(SW[1], SW[0], and_out) ;
-              
+
+    // 4, or
+    wire or_out ;
+    jor uor(SW[1], SW[0], or_out) ;
+    
+    // 5, xor
+    wire xor_out ;
+    jxor uxor(SW[1], SW[0], xor_out) ;
+                 
     always @(posedge CLK) begin
         case (mode)
             0: begin
                 r_led[15:1] = 15'b0 ;
-                r_led[0] = nand_out ;
+                r_led[0] = buf_out ;
             end
             1: begin
                 r_led[15:1] = 15'b0 ;
@@ -75,11 +98,19 @@ module jcsdemo(
             end
             2: begin
                 r_led[15:1] = 15'b0 ;
-                r_led[0] = buf_out ;
+                r_led[0] = nand_out ;
             end
             3: begin
                 r_led[15:1] = 15'b0 ;
                 r_led[0] = and_out ;
+            end
+            4: begin
+                r_led[15:1] = 15'b0 ;
+                r_led[0] = or_out ;
+            end
+            5: begin
+                r_led[15:1] = 15'b0 ;
+                r_led[0] = xor_out ;
             end
             default: begin
                 r_led[15:0] = 16'b0 ;
@@ -88,7 +119,7 @@ module jcsdemo(
     end
     
     assign LED[15:0] = r_led[15:0] ;
-    click cbtnc(CLK, BTNC, btnc_click) ;
+    click cmbtn(CLK, BTNU, mbtn_click) ;
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     
 endmodule

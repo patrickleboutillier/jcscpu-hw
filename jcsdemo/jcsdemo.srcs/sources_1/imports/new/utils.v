@@ -82,7 +82,7 @@ module seven_seg_word(input clk, input [31:0] word, output reg [6:0] sseg, outpu
             "c":        sseg = 7'b0100111; 
             "d":        sseg = 7'b0100001; 
             "e":        sseg = 7'b0000110; 
-            "f":        sseg = 7'b0111000; 
+            "f":        sseg = 7'b0001110; 
             "m":        sseg = 7'b0101010; 
             "n":        sseg = 7'b0101011; 
             "o":        sseg = 7'b0100011; 
