@@ -88,9 +88,9 @@ module jcsdemo(
     wire add_out, add_co ;
     jadd uadd(SW[1], SW[0], CI, add_out, add_co) ;
 
-	// 7, cmp
+    // 7, cmp
     wire cmp_out, cmp_eqo, cmp_alo ;
-	jcmp ucmp(SW[1], SW[0], EQI, ALI, cmp_out, cmp_eqo, cmp_alo) ;
+    jcmp ucmp(SW[1], SW[0], EQI, ALI, cmp_out, cmp_eqo, cmp_alo) ;
 	
     always @(*) begin
         case (mode)
@@ -119,14 +119,14 @@ module jcsdemo(
                 r_led[0] = xor_out ;
             end
             6: begin
-				r_led[15:12] = {add_co, 0, 0, 0} ;
-				r_led[11:1] = 11'b0 ;
+                r_led[15:12] = {add_co, 0, 0, 0} ;
+		r_led[11:1] = 11'b0 ;
                 r_led[0] = add_out ;
             end
             7: begin
-				r_led[15:12] = {0, cmp_alo, cmp_eqo, 0} ;
-				r_led[11:1] = 11'b0 ;
-				r_led[0] = cmp_out ;
+                r_led[15:12] = {0, cmp_alo, cmp_eqo, 0} ;
+                r_led[11:1] = 11'b0 ;
+                r_led[0] = cmp_out ;
             end
             default: begin
                 r_led[15:0] = 16'b0 ;
