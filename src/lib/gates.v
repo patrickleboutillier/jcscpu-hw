@@ -1,4 +1,3 @@
-`include "src/defs.v"
 
 
 module jnand(input wa, input wb, output wc) ;

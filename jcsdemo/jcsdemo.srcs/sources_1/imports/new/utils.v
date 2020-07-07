@@ -1,23 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 07/05/2020 10:36:37 PM
-// Design Name: 
-// Module Name: utils
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 
 module click(input clk, input pbi, output reg click);
@@ -39,8 +20,6 @@ module debounce(input clk, input pbi, output reg pbo);
     parameter DEBOUNCE_LIMIT = 1000000 ;  // 10 ms at 100 MHz
    
     reg [19:0] count = 0 ;
-    //reg state = 1'b0 ;
- 
     always @(posedge clk) begin
         // Switch input is different than internal switch value, so an input is
         // changing.  Increase the counter until it is stable for enough time.  
@@ -49,7 +28,6 @@ module debounce(input clk, input pbi, output reg pbo);
  
         // End of counter reached, switch is stable, register it, reset counter
         else if (count == DEBOUNCE_LIMIT) begin
-            //state <= pbi ;
             pbo <= pbi ;
             count <= 0 ;
         end 
@@ -59,9 +37,6 @@ module debounce(input clk, input pbi, output reg pbo);
             count <= 0 ;
         end
     end
- 
-    // Assign internal register to output (debounced!)
-    //assign pbo = state ;
 endmodule
 
 
@@ -103,15 +78,18 @@ module seven_seg_word(input clk, input [31:0] word, output reg [6:0] sseg, outpu
             "0":        sseg = 7'b1000000; 
             "1":        sseg = 7'b1111001;
             "a":        sseg = 7'b0100000; 
+            "b":        sseg = 7'b0000011;
             "c":        sseg = 7'b0100111; 
             "d":        sseg = 7'b0100001; 
             "e":        sseg = 7'b0000110; 
+            "f":        sseg = 7'b0111000; 
             "m":        sseg = 7'b0101010; 
             "n":        sseg = 7'b0101011; 
             "o":        sseg = 7'b0100011; 
             "p":        sseg = 7'b0001100; 
             "r":        sseg = 7'b0101111; 
             "t":        sseg = 7'b0000111;
+            "u":        sseg = 7'b1100011;
             "x":        sseg = 7'b0001001; 
             "z":        sseg = 7'b0100100; 
             default:    sseg = 7'b1111111; // " "
