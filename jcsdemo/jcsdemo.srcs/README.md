@@ -26,6 +26,11 @@ The sevent segment display displays the current demo mode. Here is the lists of 
 ## Modes
 
 ### buf(a) => (b)
-"buf" simply connects the input to the output
+"buf" simply connects the input to the output.
+* a = SW0
+* b = LD0
+
+### not(a) => (b)
+"not" connects the input and the output with a NOT gate.
 * a = SW0
 * b = LD0
