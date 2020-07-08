@@ -1,0 +1,6 @@
+// `define INLEN 8
+// `define OUTLEN 1
+// jzero x(in[0:7], out[0]) ;
+
+00000000_1
+00000010_0

@@ -54,7 +54,7 @@ module jzero (input [0:`ARCH_BITS-1] bis, output wz) ;
 endmodule
 
 
-module jbus1 (input [0:`ARCH_BITS-1] bis, input wbit1,  output [0:`ARCH_BITS-1] bos) ;
+module jbus1 (input [0:`ARCH_BITS-1] bis, input wbit1, output [0:`ARCH_BITS-1] bos) ;
 	wire wnbit1 ;
 	jnot n(wbit1, wnbit1) ;
 
