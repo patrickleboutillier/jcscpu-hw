@@ -10,7 +10,7 @@ module jcsdemo(
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
     reg [31:0] text[5:0] ;
-	parameter BUF=0, NOT=1, NAND=2, AND=3, OR=4, XOR=5, ADD=6, CMP=7, END=8 ;  
+	parameter FIRST=0, BUF=0, NOT=1, NAND=2, AND=3, OR=4, XOR=5, ADD=6, CMP=7, LAST=7 ;  
 	initial begin
 		text[BUF]     = " buf" ;
 		text[NOT]     = " not" ;
@@ -22,21 +22,22 @@ module jcsdemo(
 		text[CMP]     = " cmp" ;
 	end
     
-    // Each click moves to the next mode. The name of the mode is displayed on the 7SD.
-    wire mbtn_click, rbtn_click ;
-    click cmbtn(CLK, BTNU, mbtn_click) ;
-    click crbtn(CLK, BTND, rbtn_click) ;
-	reg [5:0] mode = 0 ;
+    // Move to the next mode when nextmode is set.
+	reg [5:0] mode = BUF, nextmode = BUF ;
     always @(posedge CLK) begin
-        if (rbtn_click) begin
-            mode = 0 ;
-        end
-        if (mbtn_click) begin
-        	mode = mode + 1 ;
-            if (mode == END) begin
-                mode = 0 ;
-            end
-		end
+        mode <= nextmode ;
+    end
+    
+    // Each click moves to the next mode. The name of the mode is displayed on the 7SD.
+    wire nmbtn_click, pmbtn_click ;
+    click cpmbtn(CLK, BTNU, pmbtn_click) ;
+    click cnmbtn(CLK, BTND, nmbtn_click) ;
+    always @(posedge CLK) begin
+        if (pmbtn_click && (mode > FIRST)) begin
+            nextmode <= mode - 1 ;
+        end else if (nmbtn_click && (mode < LAST)) begin
+        	nextmode <= mode + 1 ;
+		end 
     end
 
 
