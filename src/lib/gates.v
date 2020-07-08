@@ -119,19 +119,4 @@ func (this *ORe) AddWire(w *Wire) {
 	NewCONN(w, this.orn.is.GetWire(this.n))
 	this.n++
 }
-
-type CMP struct {
-	a, b, c, eqi, ali, eqo, alo *Wire
-}
-
-func NewCMP(wa *Wire, wb *Wire, weqi *Wire, wali *Wire, wc *Wire, weqo *Wire, walo *Wire) *CMP {
-	w23 := NewWire()
-	w45 := NewWire()
-	NewXOR(wa, wb, wc)
-	NewNOT(wc, w23)
-	NewAND(weqi, w23, weqo)
-	NewANDn(WrapBusV(weqi, wa, wc), w45)
-	NewOR(wali, w45, walo)
-	return &CMP{wa, wb, wc, weqi, wali, weqo, walo}
-}
 */
