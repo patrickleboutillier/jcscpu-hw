@@ -1,4 +1,3 @@
-`include "src/defs.v"
 
 
 module jmemory(input wi, input ws, output reg wo) ;
@@ -18,20 +17,20 @@ module jmemory(input wi, input ws, output reg wo) ;
 endmodule
 
 
-module jbyte(input [`ARCH_BITS-1:0] bis, input ws, output [`ARCH_BITS-1:0] bos) ;
+module jbyte(input [7:0] bis, input ws, output [7:0] bos) ;
 	genvar j ;
 	generate
-		for (j = 0; j < `ARCH_BITS ; j = j + 1) begin
+		for (j = 0; j < 8 ; j = j + 1) begin
 			jmemory mem(bis[j], ws, bos[j]) ;
 		end
 	endgenerate
 endmodule
 
 
-module jenabler(input [`ARCH_BITS-1:0] bis, input we, inout [`ARCH_BITS-1:0] bos) ;
+module jenabler(input [7:0] bis, input we, inout [7:0] bos) ;
 	genvar j ;
 	generate
-		for (j = 0; j < `ARCH_BITS ; j = j + 1) begin
+		for (j = 0; j < 8 ; j = j + 1) begin
 			wire out ;
 			jand a(bis[j], we, out) ;
 			assign bos[j] = (we) ? out : 1'bz ;
@@ -40,8 +39,8 @@ module jenabler(input [`ARCH_BITS-1:0] bis, input we, inout [`ARCH_BITS-1:0] bos
 endmodule
 
 
-module jregister(input [`ARCH_BITS-1:0] bis, input ws, input we, inout [`ARCH_BITS-1:0] bos) ;
-	wire [`ARCH_BITS-1:0] bus ;
+module jregister(input [7:0] bis, input ws, input we, inout [7:0] bos) ;
+	wire [7:0] bus ;
 	jbyte byte(bis, ws, bus) ;
 	jenabler enabler(bus, we, bos) ;
 endmodule
