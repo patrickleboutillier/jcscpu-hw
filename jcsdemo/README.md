@@ -18,12 +18,16 @@ The sevent segment display displays the current demo mode. Here is the lists of 
 * xor
 * add
 * cmp
+* shr
+* shl
 
 ### Push buttons (callout #7)
-* _BTNU_: The top button is used to toggle between the different demo modes.
+* _BTNU_: The top button is used to mode the previous demo mode.* 
+* _BTND_: The bottom button is used to mode the previous demo mode.
 * _BTNL_: When pressed, sets the "carry in" (_CI_) input to 1 for the various ALU components.
-* _BTNC_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various ALU components.
-* _BTNR_: When pressed, sets the "a-larger in" (_ALI_) input to 1 for the various ALU components.
+* _BTNC_: When pressed, sets the "a-larger in" (_ALI_) input to 1 for the various ALU components.
+* _BTNR_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various ALU components.
+
 
 ### Switches (_SW15_ through _SW0_) (callout #5)
 Switches are used to control the input bits to the various components.
@@ -90,3 +94,17 @@ LEDs are used to indicate the output values for the various components.
 * eqo = _EQO_
 * alo = _ALO_
 * co = _CO_
+
+### shr
+"shr" connects the inputs and the output with a SHIFTR circuit (page XX).
+* a = _SW[7:0]_
+* b = _LD[7:0]_
+* si = _CI_
+* so = _CO_
+
+### shl
+"shl" connects the inputs and the output with a SHIFTL circuit (page XX).
+* a = _SW[7:0]_
+* b = _LD[7:0]_
+* si = _CI_
+* so = _CO_
