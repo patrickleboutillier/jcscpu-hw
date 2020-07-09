@@ -75,24 +75,26 @@ module seven_seg_word(input clk, input [31:0] word, output reg [6:0] sseg, outpu
     always @(*) begin       
         dp = 1 ;
         case(led_ascii)
-            "0":        sseg = 7'b1000000; 
-            "1":        sseg = 7'b1111001;
-            "a":        sseg = 7'b0100000; 
-            "b":        sseg = 7'b0000011;
-            "c":        sseg = 7'b0100111; 
-            "d":        sseg = 7'b0100001; 
-            "e":        sseg = 7'b0000110; 
-            "f":        sseg = 7'b0001110; 
-            "m":        sseg = 7'b0101010; 
-            "n":        sseg = 7'b0101011; 
-            "o":        sseg = 7'b0100011; 
-            "p":        sseg = 7'b0001100; 
-            "r":        sseg = 7'b0101111; 
-            "t":        sseg = 7'b0000111;
-            "u":        sseg = 7'b1100011;
-            "x":        sseg = 7'b0001001; 
-            "z":        sseg = 7'b0100100; 
-            default:    sseg = 7'b1111111; // " "
+            "0":        sseg = 7'b1000000 ; 
+            "a":        sseg = 7'b0100000 ; 
+            "b":        sseg = 7'b0000011 ;
+            "c":        sseg = 7'b0100111 ; 
+            "d":        sseg = 7'b0100001 ; 
+            "e":        sseg = 7'b0000110 ; 
+            "f":        sseg = 7'b0001110 ;
+            "h":        sseg = 7'b0001011 ;
+            "l":        sseg = 7'b1111001 ; 
+            "m":        sseg = 7'b0101010 ; 
+            "n":        sseg = 7'b0101011 ; 
+            "o":        sseg = 7'b0100011 ; 
+            "p":        sseg = 7'b0001100 ; 
+            "r":        sseg = 7'b0101111 ;
+            "s":        sseg = 7'b0010010 ; 
+            "t":        sseg = 7'b0000111 ;
+            "u":        sseg = 7'b1100011 ;
+            "x":        sseg = 7'b0001001 ; 
+            "z":        sseg = 7'b0100100 ; 
+            default:    sseg = 7'b1111111 ; // " "
         endcase
     end
 endmodule 

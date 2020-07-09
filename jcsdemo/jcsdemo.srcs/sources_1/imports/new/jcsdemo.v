@@ -9,18 +9,7 @@ module jcsdemo(
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
-    reg [31:0] text[5:0] ;
-	parameter FIRST=0, BUF=0, NOT=1, NAND=2, AND=3, OR=4, XOR=5, ADD=6, CMP=7, LAST=7 ;  
-	initial begin
-		text[BUF]     = " buf" ;
-		text[NOT]     = " not" ;
-		text[NAND]    = "nand" ;
-		text[AND]     = " and" ;
-		text[OR]      = "  or" ;
-		text[XOR]     = " xor" ;
-		text[ADD]     = " add" ;
-		text[CMP]     = " cmp" ;
-	end
+	parameter FIRST=0, BUF=0, NOT=1, NAND=2, AND=3, OR=4, XOR=5, ADD=6, CMP=7, SHR=8, SHL=9, LAST=9 ;  
     
     // Move to the next mode when nextmode is set.
 	reg [5:0] mode = BUF, nextmode = BUF ;
@@ -79,49 +68,78 @@ module jcsdemo(
     wire cmp_out, cmp_eqo, cmp_alo ;
     jcmp ucmp(SW[1], SW[0], EQI, ALI, cmp_out, cmp_eqo, cmp_alo) ;
 
+    // shr
+    wire [7:0] shr_out ;
+    wire shr_co ;
+    jshiftr ushr(SW[7:0], CI, shr_out, shr_co) ;
 
+    // shl
+    wire [7:0] shl_out ;
+    wire shl_co ;
+    jshiftl ushl(SW[7:0], CI, shl_out, shl_co) ;
+        
     // Drive the LEDs (output results), and the 7SD from the word reg.
-    reg [15:0] LED = 0 ;
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
-    always @(mode) begin
-        word = text[mode] ;
+    always @(*) begin
+        // word = text[mode] ;
         case (mode)
             BUF: begin
+                word = " buf" ;
                 LED[15:1] = 0 ;
                 LED[0] = buf_out ;
             end
             NOT: begin
+                word = " not" ;
                 LED[15:1] = 0 ;
                 LED[0] = not_out ;
             end
             NAND: begin
+                 word = " nand" ;
                 LED[15:1] = 0 ;
                 LED[0] = nand_out ;
             end
             AND: begin
+                word = " and" ;
                 LED[15:1] = 0 ;
                 LED[0] = and_out ;
             end
             OR: begin
+                word = " or" ;
                 LED[15:1] = 0 ;
                 LED[0] = or_out ;
             end
             XOR: begin
+                word = " xor" ;
                 LED[15:1] = 0 ;
                 LED[0] = xor_out ;
             end
             ADD: begin
+                word = " add" ;
                 LED[15:12] = {add_co, 3'b000} ;
                 LED[11:1] = 0 ;
                 LED[0] = add_out ;
             end
             CMP: begin
+                word = " cmp" ;
                 LED[15:12] = {1'b0, cmp_alo, cmp_eqo, 1'b0} ;
                 LED[11:1] = 0 ;
                 LED[0] = cmp_out ;
             end
+            SHR: begin
+                word = " shr" ;
+                LED[15] = shr_co ;
+                LED[14:8] = 0 ;
+                LED[7:0] = shr_out ;
+            end
+            SHL: begin
+                word = " shl" ;
+                LED[15] = shl_co ;
+                LED[14:8] = 0 ;
+                LED[7:0] = shl_out ;
+            end
             default: begin
+                word = "    " ;
                 LED = 0 ;
             end
         endcase

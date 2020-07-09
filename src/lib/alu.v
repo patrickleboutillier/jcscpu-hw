@@ -1,66 +1,65 @@
-`include "src/defs.v"
 
 
-module jshiftr (input [0:`ARCH_BITS-1] bis, input wci, output [0:`ARCH_BITS-1] bos, output wco) ;
+module jshiftr (input [0:7] bis, input wci, output [0:7] bos, output wco) ;
 	jbuf b0(wci, bos[0]) ;
 	
 	genvar j ;
-	for (j = 1; j < `ARCH_BITS ; j = j + 1) begin
+	for (j = 1; j < 8 ; j = j + 1) begin
 		jbuf bj(bis[j-1], bos[j]) ;
 	end
-	jbuf bn(bis[`ARCH_BITS-1], wco) ;
+	jbuf bn(bis[7], wco) ;
 endmodule
 
 
-module jshiftl (input [0:`ARCH_BITS-1] bis, input wci, output [0:`ARCH_BITS-1] bos, output wco) ;
+module jshiftl (input [0:7] bis, input wci, output [0:7] bos, output wco) ;
 	jbuf b0(bis[0], wco) ;
 	
 	genvar j ;
-	for (j = 1; j < `ARCH_BITS ; j = j + 1) begin
+	for (j = 1; j < 8 ; j = j + 1) begin
 		jbuf bj(bis[j], bos[j-1]) ;
 	end
-	jbuf bn(wci, bos[`ARCH_BITS-1]) ;
+	jbuf bn(wci, bos[7]) ;
 endmodule
 
 
-module jnotter (input [0:`ARCH_BITS-1] bis, output [0:`ARCH_BITS-1] bos) ;
+module jnotter (input [0:7] bis, output [0:7] bos) ;
 	genvar j ;
-	for (j = 0; j < `ARCH_BITS ; j = j + 1) begin
+	for (j = 0; j < 8 ; j = j + 1) begin
 		jnot nj(bis[j], bos[j]) ;
 	end
 endmodule
 
 
-module jandder (input [0:`ARCH_BITS-1] bas, input [0:`ARCH_BITS-1] bbs, output [0:`ARCH_BITS-1] bcs) ;
+module jandder (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 	genvar j ;
-	for (j = 0; j < `ARCH_BITS ; j = j + 1) begin
+	for (j = 0; j < 8 ; j = j + 1) begin
 		jand nj(bas[j], bbs[j], bcs[j]) ;
 	end
 endmodule
 
 
-module jorer (input [0:`ARCH_BITS-1] bas, input [0:`ARCH_BITS-1] bbs, output [0:`ARCH_BITS-1] bcs) ;
+module jorer (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 	genvar j ;
-	for (j = 0; j < `ARCH_BITS ; j = j + 1) begin
+	for (j = 0; j < 8 ; j = j + 1) begin
 		jor oj(bas[j], bbs[j], bcs[j]) ;
 	end
 endmodule
 
 
-module jzero (input [0:`ARCH_BITS-1] bis, output wz) ;
+module jzero (input [0:7] bis, output wz) ;
 	wire wi ;
-	jorN #(`ARCH_BITS) orn(bis, wi) ;
+	jorN #(8) orn(bis, wi) ;
 	jnot n(wi, wz) ;
 endmodule
 
 
-module jbus1 (input [0:`ARCH_BITS-1] bis, input wbit1, output [0:`ARCH_BITS-1] bos) ;
+module jbus1 (input [0:7] bis, input wbit1, output [0:7] bos) ;
 	wire wnbit1 ;
 	jnot n(wbit1, wnbit1) ;
 
 	genvar j ;
-	for (j = 0 ; j < `ARCH_BITS ; j = j + 1) begin
-		if (j < `ARCH_BITS-1) begin
+	for (j = 0 ; j < 8 ; j = j + 1) begin
+		if (j < 7) begin
 			jand andj(bis[j], wnbit1, bos[j]) ;
 		end else begin
 			jor orj(bis[j], wbit1, bos[j]) ;
