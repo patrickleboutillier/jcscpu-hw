@@ -84,7 +84,7 @@ LEDs are used to indicate the output values for the various components.
 * c = _LD0_
 * co = _CO_
 
-### cmp
+### cmp(a, b, eqi, ali) => (c, eqo, alo, co)
 "cmp" connects the inputs and the output with a CMP circuit (page 83).
 * a = _SW1_
 * b = _SW0_
@@ -95,16 +95,16 @@ LEDs are used to indicate the output values for the various components.
 * alo = _ALO_
 * co = _CO_
 
-### shr
+### shr(A, si, B, so)
 "shr" connects the inputs and the output with a SHIFTR circuit (page XX).
-* a = _SW[7:0]_
-* b = _LD[7:0]_
+* A = _SW[7:0]_
+* B = _LD[7:0]_
 * si = _CI_
 * so = _CO_
 
-### shl
+### shl(A, si, B, so)
 "shl" connects the inputs and the output with a SHIFTL circuit (page XX).
-* a = _SW[7:0]_
-* b = _LD[7:0]_
+* A = _SW[7:0]_
+* B = _LD[7:0]_
 * si = _CI_
 * so = _CO_
