@@ -22,7 +22,7 @@ module jshiftl (input [0:7] bis, input wci, output [0:7] bos, output wco) ;
 endmodule
 
 
-module jnotter (input [0:7] bis, output [0:7] bos) ;
+module jnotter (input [7:0] bis, output [7:0] bos) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jnot nj(bis[j], bos[j]) ;
@@ -30,7 +30,7 @@ module jnotter (input [0:7] bis, output [0:7] bos) ;
 endmodule
 
 
-module jandder (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
+module jandder (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jand nj(bas[j], bbs[j], bcs[j]) ;
@@ -38,7 +38,7 @@ module jandder (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 endmodule
 
 
-module jorer (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
+module jorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jor oj(bas[j], bbs[j], bcs[j]) ;
@@ -46,20 +46,47 @@ module jorer (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 endmodule
 
 
-module jzero (input [0:7] bis, output wz) ;
+module jxorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs, output weqo, output walo) ;
+	// Build the XORer circuit
+	reg one = 1 ;
+	reg zero = 0 ;
+	wire [0:6] teqo, talo ;
+
+	genvar j ;
+	jcmp cmp0(bas[0], bbs[0], one, zero, bcs[0], teqo[0], talo[0]) ;
+	for (j = 1; j < 7 ; j = j + 1) begin
+		jcmp cmpj(bas[j], bbs[j], teqo[j-1], talo[j-1], bcs[j], teqo[j], talo[j]) ;
+	end
+	jcmp cmpn(bas[7], bbs[7], teqo[6], talo[6], bcs[7], weqo, walo) ;
+endmodule
+
+
+module jadder (input [7:0] bas, input [7:0] bbs, input wci, output [7:0] bcs, output wco) ;
+	wire [0:6] tc ;
+
+	genvar j ;
+	jadd add0(bas[0], bbs[0], wci, bcs[0], tc[0]) ;
+	for (j = 1; j < 7; j = j + 1) begin
+		jadd addj(bas[j], bbs[j], tc[j-1], bcs[j], tc[j]) ;
+	end
+	jadd addn(bas[7], bbs[7], tc[6], bcs[7], wco) ;
+endmodule
+
+
+module jzero (input [7:0] bis, output wz) ;
 	wire wi ;
 	jorN #(8) orn(bis, wi) ;
 	jnot n(wi, wz) ;
 endmodule
 
 
-module jbus1 (input [0:7] bis, input wbit1, output [0:7] bos) ;
+module jbus1 (input [7:0] bis, input wbit1, output [7:0] bos) ;
 	wire wnbit1 ;
 	jnot n(wbit1, wnbit1) ;
 
 	genvar j ;
 	for (j = 0 ; j < 8 ; j = j + 1) begin
-		if (j < 7) begin
+		if (j > 0) begin
 			jand andj(bis[j], wnbit1, bos[j]) ;
 		end else begin
 			jor orj(bis[j], wbit1, bos[j]) ;
@@ -86,26 +113,5 @@ func NewADDer(bas *g.Bus, bbs *g.Bus, wci *g.Wire, bcs *g.Bus, wco *g.Wire) *ADD
 	}
 	return &ADDer{bas, bbs, bcs, wci, wco}
 }
-
-func NewXORer(bas *g.Bus, bbs *g.Bus, bcs *g.Bus, weqo *g.Wire, walo *g.Wire) *XORer {
-	// Build the XORer circuit
-	weqi := g.WireOn()
-	wali := g.WireOff()
-	for j := 0; j < bas.GetSize(); j++ {
-		teqo := g.NewWire()
-		talo := g.NewWire()
-		te := teqo
-		ta := talo
-		if j == (bas.GetSize() - 1) {
-			te = weqo
-			ta = walo
-		}
-		g.NewCMP(bas.GetWire(j), bbs.GetWire(j), weqi, wali, bcs.GetWire(j), te, ta)
-		weqi = teqo
-		wali = talo
-	}
-	return &XORer{bas, bbs, bcs, weqo, walo}
-}
-
 
 */
