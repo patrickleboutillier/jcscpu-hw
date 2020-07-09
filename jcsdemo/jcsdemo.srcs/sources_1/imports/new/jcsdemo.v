@@ -9,7 +9,9 @@ module jcsdemo(
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
-	parameter FIRST=0, BUF=0, NOT=1, NAND=2, AND=3, OR=4, XOR=5, ADD=6, CMP=7, SHR=8, SHL=9, LAST=9 ;  
+	parameter 
+	   FIRST=10, 
+	   BUF=10, NOT=11, NAND=12, AND=13, OR=14, XOR=15, ADD=16, CMP=17, SHR=18, SHL=19, LAST=19 ;  
     
     // Move to the next mode when nextmode is set.
 	reg [5:0] mode = BUF, nextmode = BUF ;
@@ -95,7 +97,7 @@ module jcsdemo(
                 LED[0] = not_out ;
             end
             NAND: begin
-                 word = " nand" ;
+                 word = "nand" ;
                 LED[15:1] = 0 ;
                 LED[0] = nand_out ;
             end
@@ -105,7 +107,7 @@ module jcsdemo(
                 LED[0] = and_out ;
             end
             OR: begin
-                word = " or" ;
+                word = "  or" ;
                 LED[15:1] = 0 ;
                 LED[0] = or_out ;
             end
