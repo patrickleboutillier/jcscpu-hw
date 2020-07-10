@@ -93,25 +93,3 @@ module jbus1 (input [7:0] bis, input wbit1, output [7:0] bos) ;
 		end
 	end
 endmodule
-
-
-/*
-
-
-func NewADDer(bas *g.Bus, bbs *g.Bus, wci *g.Wire, bcs *g.Bus, wco *g.Wire) *ADDer {
-	// Build the ADDer circuit
-	twci := g.NewWire()
-	twco := wco
-	for j := 0; j < bas.GetSize(); j++ {
-		tw := twci
-		if j == (bas.GetSize() - 1) {
-			tw = wci
-		}
-		g.NewADD(bas.GetWire(j), bbs.GetWire(j), tw, bcs.GetWire(j), twco)
-		twco = twci
-		twci = g.NewWire()
-	}
-	return &ADDer{bas, bbs, bcs, wci, wco}
-}
-
-*/
