@@ -103,7 +103,7 @@ LEDs are used to indicate the output values for the various components.
 * alo = _ALO_
 * co = _CO_
 
-## ALU circuits
+## ALU and related circuits
 
 ### shr(A, si) => (B, so)
 "shr" connects the inputs and the outputs with a SHIFTR circuit (page 73).
