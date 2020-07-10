@@ -105,7 +105,7 @@ module jcsdemo(
     jzero uzero(SW[7:0], zero_out) ;
 
     // zero
-	wire bus1_out ;
+	wire [7:0] bus1_out ;
     jbus1 ubus1(SW[7:0], CI, bus1_out) ;
 
     // Drive the LEDs (output results), and the 7SD from the word reg.
@@ -192,8 +192,8 @@ module jcsdemo(
             end
             ZERO: begin
                 word = "zero" ;
-                LED[15:1] = 0 ;
-                LED[0] = zero_out ;
+                LED[15:12] = {3'b000, zero_out} ;
+                LED[11:0] = 0 ;
             end
             BUS1: begin
                 word = "bus1" ;

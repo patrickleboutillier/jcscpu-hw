@@ -76,6 +76,7 @@ module seven_seg_word(input clk, input [31:0] word, output reg [6:0] sseg, outpu
         dp = 1 ;
         case(led_ascii)
             "0":        sseg = 7'b1000000 ; 
+            "1":        sseg = 7'b1111001 ;
             "a":        sseg = 7'b0100000 ; 
             "b":        sseg = 7'b0000011 ;
             "c":        sseg = 7'b0100111 ; 
