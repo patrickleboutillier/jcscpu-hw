@@ -20,6 +20,7 @@ The sevent segment display displays the current demo mode. Here is the lists of 
 * cmp
 * shr
 * shl
+* notr
 * andr
 * orr
 * xorr
@@ -119,20 +120,25 @@ LEDs are used to indicate the output values for the various components.
 * si = _CI_
 * so = _CO_
 
+### notr(A) => (B)
+"notrr" connects the inputs and the output with an NOTTER circuit (page 75).
+* A = _SW[7:0]_
+* B = _LD[7:0]_
+
 ### andr(A, B) => (C)
-"andr" connects the inputs and the output with an ANDDER circuit (page XX).
+"andr" connects the inputs and the output with an ANDDER circuit (page 76).
 * A = _SW[15:8]_
 * B = _SW[7:0]_
 * C = _LD[7:0]_
 
 ### orr(A, B) => (C)
-"orr" connects the inputs and the output with an ORER circuit (page XX).
+"orr" connects the inputs and the output with an ORER circuit (page 77).
 * A = _SW[15:8]_
 * B = _SW[7:0]_
 * C = _LD[7:0]_
 
 ### xorr(A, B) => (C, eqo, alo)
-"xorr" connects the inputs and the outputs with an XORER circuit (page XX).
+"xorr" connects the inputs and the outputs with an XORER (actually a comparator) circuit (page 78, 80).
 * A = _SW[15:8]_
 * B = _SW[7:0]_
 * C = _LD[7:0]_
@@ -140,7 +146,7 @@ LEDs are used to indicate the output values for the various components.
 * alo = _ALO_
 
 ### addr(A, B, ci) => (C, co)
-"addr" connects the inputs and the outputs with an AADDER circuit (page XX).
+"addr" connects the inputs and the outputs with an ADDER circuit (page 79).
 * A = _SW[15:8]_
 * B = _SW[7:0]_
 * ci => _CI_
@@ -148,12 +154,12 @@ LEDs are used to indicate the output values for the various components.
 * co => _CO_
 
 ### zero(A) => (zero)
-"zero" connects the inputs and the outputs with an ZERO circuit (page XX).
+"zero" connects the inputs and the outputs with an ZERO circuit (page 84).
 * A = _SW[7:0]_
 * zero = _Z_
 
 ### bus1(A, bit1) => (B)
-"bus1" connects the inputs and the output with an BUS1 circuit (page XX).
+"bus1" connects the inputs and the output with an BUS1 circuit (page 90).
 * A = _SW[7:0]_
 * bit1 => _CI_
 * B => _LD[7:0]_
