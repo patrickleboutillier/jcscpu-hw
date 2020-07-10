@@ -10,7 +10,7 @@ The following IO elements of the Basys-3 board are used in the demo:
 
 ## Seven Segment Display (callout #4)
 The sevent segment display displays the current demo mode. Here is the lists of the demo modes:
-* buf
+* **buf**
 * not
 * nand
 * and
