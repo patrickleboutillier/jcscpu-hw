@@ -10,10 +10,11 @@ module jcsdemo(
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
 	parameter 
-	   FIRST=10, 
+	   FIRST=8, 
+	   REG=8, MEM=9,
 	   BUF=10, NOT=11, NAND=12, AND=13, OR=14, XOR=15, ADD=16, CMP=17, 
-       SHR=18, SHL=19, ANDR=20, ORR=21, XORR=22, 
-	   ADDR=23, ZERO=24, BUS1=25, LAST=25 ;  
+       SHR=18, SHL=19, NOTR=20, ANDR=21, ORR=22, XORR=23, 
+	   ADDR=24, ZERO=25, BUS1=26, LAST=26 ;  
     
     // Move to the next mode when nextmode is set.
 	reg [5:0] mode = BUF, nextmode = BUF ;
@@ -39,7 +40,17 @@ module jcsdemo(
     assign CI = BTNL ;
     assign ALI = BTNC ;
     assign EQI = BTNR ;
-         
+    assign SET = CI ;
+    assign ENA = EQI ;
+ 
+     // reg
+    wire [7:0] reg_out ;
+    jgreg ugreg(SW[7:0], SET, ENA, reg_out) ;
+       
+    // mem
+    wire mem_out ;
+    jgmem ugmem(SW[0], SET, mem_out) ;
+             
     // buf
     wire buf_out ;
     jbuf ubuf(SW[0], buf_out) ;
@@ -82,6 +93,10 @@ module jcsdemo(
     wire shl_co ;
     jshiftl ushl(SW[7:0], CI, shl_out, shl_co) ;
 
+    // notr
+    wire [7:0] notr_out ;
+    jnotter unotter(SW[7:0], notr_out) ;
+    
     // andr
     wire [7:0] andr_out ;
     jandder uandder(SW[15:8], SW[7:0], andr_out) ;
@@ -114,6 +129,16 @@ module jcsdemo(
     always @(*) begin
         // word = text[mode] ;
         case (mode)
+            REG: begin
+                word = " reg" ;
+                LED[15:8] = 0 ;
+                LED[7:0] = reg_out ;
+            end
+            MEM: begin
+                word = " mem" ;
+                LED[15:1] = 0 ;
+                LED[0] = mem_out ;
+            end
             BUF: begin
                 word = " buf" ;
                 LED[15:1] = 0 ;
@@ -167,6 +192,11 @@ module jcsdemo(
                 LED[15] = shl_co ;
                 LED[14:8] = 0 ;
                 LED[7:0] = shl_out ;
+            end
+            NOTR: begin
+                word = "notr" ;
+                LED[15:8] = 0 ;
+                LED[7:0] = notr_out ;
             end
             ANDR: begin
                 word = "andr" ;
