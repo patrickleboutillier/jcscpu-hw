@@ -85,6 +85,7 @@ module seven_seg_word(input clk, input [31:0] word, output reg [6:0] sseg, outpu
             "f":        sseg = 7'b0001110 ;
             "g":        sseg = 7'b0010000 ; 
             "h":        sseg = 7'b0001011 ;
+            "k":        sseg = 7'b0001010 ;
             "l":        sseg = 7'b1001111 ; 
             "m":        sseg = 7'b0101010 ; 
             "n":        sseg = 7'b0101011 ; 
@@ -100,3 +101,23 @@ module seven_seg_word(input clk, input [31:0] word, output reg [6:0] sseg, outpu
         endcase
     end
 endmodule 
+
+
+module genclock #(parameter HZ=1) (input clkin, output reg clkout) ;
+    integer count = 0 ;
+    localparam max = 100000000 / HZ ;
+    
+    always @ (posedge clkin) begin
+        if (count == max - 1)
+            count <= 0 ;
+        else
+            count <= count + 1 ;
+    end
+    
+    always @ (posedge clkin) begin
+        if (count == max - 1)
+            clkout <= ~clkout ;
+        else
+            clkout <= clkout ;
+    end
+endmodule

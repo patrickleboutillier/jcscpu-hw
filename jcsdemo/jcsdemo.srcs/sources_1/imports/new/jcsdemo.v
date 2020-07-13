@@ -10,8 +10,8 @@ module jcsdemo(
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
 	parameter 
-	   FIRST=8, 
-	   REG=8, MEM=9,
+	   FIRST=6, 
+	   CLOCK=6, RAM=7, REG=8, MEM=9,
 	   BUF=10, NOT=11, NAND=12, AND=13, OR=14, XOR=15, ADD=16, CMP=17, 
        SHR=18, SHL=19, NOTR=20, ANDR=21, ORR=22, XORR=23, 
 	   ADDR=24, ZERO=25, BUS1=26, LAST=26 ;  
@@ -40,16 +40,32 @@ module jcsdemo(
     assign CI = BTNL ;
     assign ALI = BTNC ;
     assign EQI = BTNR ;
-    assign SET = CI ;
-    assign ENA = EQI ;
- 
+    assign SET = BTNL ;
+    assign SETA = BTNC ;
+    assign ENA = BTNR ;
+    
+    // 1 HZ clock, slow so that we can see each tick with the LEDs
+    wire clk_in ;
+    genclock #(1) gc(CLK, clk_in) ;
+    
+    // clock
+    wire clk_out, clkd_out, clke_out, clks_out ;
+    jclock uclock(clk_in, clk_out, clkd_out, clke_out, clks_out) ; 
+    
+    // RAM
+    wire [7:0] ram_io, ram_out ;
+    reg [7:0] ram_in ;
+    assign ram_out = ram_io ;
+    assign ram_io = (SET) ? SW[7:0] : 8'bzzzzzzzz ;
+    jRAM uram(SW[15:8], SETA, ram_io, SET, ENA) ;
+
      // reg
     wire [7:0] reg_out ;
-    jgreg ugreg(SW[7:0], SET, ENA, reg_out) ;
-       
+    jregister ureg(SW[7:0], SET, ENA, reg_out) ;
+        
     // mem
     wire mem_out ;
-    jgmem ugmem(SW[0], SET, mem_out) ;
+    jmemory umemory(SW[0], SET, mem_out) ;
              
     // buf
     wire buf_out ;
@@ -129,6 +145,16 @@ module jcsdemo(
     always @(*) begin
         // word = text[mode] ;
         case (mode)
+            RAM: begin
+                word = " ram" ;
+                LED[15:8] = 0 ;
+                LED[7:0] = ram_out ;
+            end
+            CLOCK: begin
+                word = " clk" ;
+                LED[15:4] = 0 ;
+                LED[3:0] = {clk_out, clkd_out, clke_out, clks_out} ;
+            end
             REG: begin
                 word = " reg" ;
                 LED[15:8] = 0 ;

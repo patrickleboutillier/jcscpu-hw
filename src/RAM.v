@@ -1,17 +1,15 @@
-`include "src/defs.v"
 
 
-module jRAM #(parameter N=8) (input [`ARCH_BITS-1:0] bas, input wsa, inout [`ARCH_BITS-1:0] bio, input ws, input we) ;
-	wire [`ARCH_BITS-1:0] busd ;
+module jRAM (input [7:0] bas, input wsa, inout [7:0] bio, input ws, input we) ;
+	wire [7:0] busd ;
 	reg on = 1 ;
 	jregister MAR(bas, wsa, on, busd) ;
 
-	/*
-	localparam n = N / 2 ;
-	localparam n2 = 1 << n ;
-	wire [n2-1:0] wxs, wys ;
-	jdecoder #(n, n2) decx(busd[n-1:0], wxs) ;
-	jdecoder #(n, n2) decy(busd[N-1:n], wys) ;
+	localparam n = 4 ;
+	localparam n2 = 16 ;
+	wire [15:0] wxs, wys ;
+	jdecoder #(4, 16) decx(busd[7:4], wxs) ;
+	jdecoder #(4, 16) decy(busd[3:0], wys) ;
 
 	genvar x, y ;
 	generate
@@ -26,15 +24,17 @@ module jRAM #(parameter N=8) (input [`ARCH_BITS-1:0] bas, input wsa, inout [`ARC
 			end
 		end
 	endgenerate
-	*/
 
+    /*
 	reg [`ARCH_BITS-1:0] RAM[0:(1<<`ARCH_BITS)-1] ;
 	assign bio = (we) ? RAM[busd] : {`ARCH_BITS{1'bz}} ;
 	always @(ws) begin
 		if (ws)
 			RAM[busd] = bio ;
 	end
+	*/
 endmodule
+
 
 /*
 func NewRAMClassic(bas *g.Bus, wsa *g.Wire, bio *g.Bus, ws *g.Wire, we *g.Wire) *RAM {

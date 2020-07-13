@@ -1,6 +1,6 @@
 
 // Gate-based memory as shown in the book 
-module jgmem(input wi, input ws, output wo) ;
+module jmemory(input wi, input ws, output wo) ;
 	wire wa, wb, wc ;
  	jnand nand1(wi, ws, wa) ;
 	jnand nand2(wa, ws, wb) ;
@@ -18,11 +18,11 @@ module jrmem(input clk, input wi, input ws, output reg wo) ;
 endmodule
 
 
-module jgbyte(input [7:0] bis, input ws, output [7:0] bos) ;
+module jbyte(input [7:0] bis, input ws, output [7:0] bos) ;
 	genvar j ;
 	generate
 		for (j = 0; j < 8 ; j = j + 1) begin
-			jgmem mem(bis[j], ws, bos[j]) ;
+			jmemory mem(bis[j], ws, bos[j]) ;
 		end
 	endgenerate
 endmodule
@@ -38,9 +38,9 @@ module jrbyte(input clk, input [7:0] bis, input ws, output [7:0] bos) ;
 endmodule
 
 
-module jgreg(input [7:0] bis, input ws, input we, inout [7:0] bos) ;
+module jregister(input [7:0] bis, input ws, input we, inout [7:0] bos) ;
 	wire [7:0] bus ;
-	jgbyte byte(bis, ws, bus) ;
+	jbyte byte(bis, ws, bus) ;
 	jenabler enabler(bus, we, bos) ;
 endmodule
 
