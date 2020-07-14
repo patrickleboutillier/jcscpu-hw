@@ -9,6 +9,17 @@ module jmemory(input wi, input ws, output wo) ;
 endmodule
 
 
+// Latch-based memory, which can yield a predictable output value.
+module jlatch(input wi, input ws, output wo) ;
+	reg ro = 0 ;
+	assign wo = ro ;
+    always @(wi or ws) begin
+        if (ws)
+            ro <= wi ;
+    end
+endmodule
+
+
 // Flip-flop based memory, which is more commonly used in FPGAs.
 module jrmem(input clk, input wi, input ws, output reg wo) ;
 	always @(posedge clk) begin

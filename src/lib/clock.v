@@ -1,12 +1,18 @@
 
 
-module jclock (input clk, output reg wclk, output reg wclkd, output wclke, output wclks) ;
+module jclock (input clk, input reset, output reg wclk, output reg wclkd, output wclke, output wclks) ;
 	always @(posedge clk) begin
-		wclk <= ~wclk ;
+		if (reset)
+			wclk <= 0 ;
+		else
+			wclk <= ~wclk ;
 	end
 
 	always @(negedge clk) begin
-		wclkd <= ~wclkd ;
+		if (reset)
+			wclkd <= 0 ;
+		else
+			wclkd <= ~wclkd ;
 	end
 
 	jor or1(wclk, wclkd, wclke) ;
@@ -14,80 +20,88 @@ module jclock (input clk, output reg wclk, output reg wclkd, output wclke, outpu
 endmodule
 
 
-module jstepper (input clk, output [0:6] bos) ;
-	wire wrst, wnrm1, wncol, wmsn, wmsnn ;
+// Flip-flop based memory, which is more commonly used in FPGAs.
+module rmem(input reset, input wi, input ws, output wo) ;
+	jlatch l(wi, ws, wo) ;
+	//jmemory l(wi, ws, wo) ;
+endmodule
+
+
+module jstepper (input clk, input reset, output [0:6] bos, output [0:6] more) ;
+	reg wrst = 0 ;
+	// Loop around to wrst
+	// assign wrst = bos[6] ;
+
+	wire wnrm1, wnco1, wmsn, wmsnn ;
 	jnot not1(wrst, wnrm1) ;
-	jnot not2(wclk, wnco1) ;
+	jnot not2(clk, wnco1) ;
 	jor or1(wrst, wnco1, wmsn) ;
-	jor or2(wrst, wclk, wmsnn) ;
+	jor or2(wrst, clk, wmsnn) ;
 
 	// M1
 	wire wn12b, wm112 ;
 	jor s1(wrst, wn12b, bos[0]) ;
-	jmemory m1(wnrm1, wmsn, wm112) ;
+	rmem m1(reset, wnrm1, wmsn, wm112) ;
 
 	// M12
 	wire wn12a ;
 	jnot not12(wn12a, wn12b) ;
-	jmemory m12(wm112, wmsnn, wn12a) ;
+	rmem m12(reset, wm112, wmsnn, wn12a) ;
+
+	assign more[0:5] = {wrst, wnrm1, wmsn, wm112, wmsnn, wn12a} ;
 
 	// M2
 	wire wn23b, wm223 ;
 	jand s2(wn12a, wn23b, bos[1]) ;
-	jmemory m2(wn12a, wmsn, wm223) ;
+	rmem m2(reset, wn12a, wmsn, wm223) ;
 
 	// M23
 	wire wn23a ;
 	jnot not23(wn23a, wn23b) ;
-	jmemory m23(wm223, wmsnn, wn23a) ;
+	rmem m23(reset, wm223, wmsnn, wn23a) ;
 
-    /*
+	/*
 	// M3
-	wn34b := g.NewWire()
-	s3 := g.NewAND(wn23a, wn34b, bos[2])
-	wm334 := g.NewWire()
-	m3 := NewNamedMemory(wn23a, wmsn, wm334, " 3")
+	wire wn34b, wm334 ;
+	jand s3(wn23a, wn34b, bos[2]) ;
+	rmem m3(sclk, reset, wn23a, wmsn, wm334) ;
 
 	// M34
-	wn34a := g.NewWire()
-	g.NewNOT(wn34a, wn34b)
-	m34 := NewNamedMemory(wm334, wmsnn, wn34a, "34")
+	wire wn34a ;
+	jnot not34(wn34a, wn34b) ;
+	rmem m34(sclk, reset, wm334, wmsnn, wn34a) ;
 
 	// M4
-	wn45b := g.NewWire()
-	s4 := g.NewAND(wn34a, wn45b, bos[3])
-	wm445 := g.NewWire()
-	m4 := NewNamedMemory(wn34a, wmsn, wm445, " 4")
+	wire wn45b, wm445 ;
+	jand s4(wn34a, wn45b, bos[3]) ;
+	rmem m4(sclk, reset, wn34a, wmsn, wm445) ;
 
 	// M45
-	wn45a := g.NewWire()
-	g.NewNOT(wn45a, wn45b)
-	m45 := NewNamedMemory(wm445, wmsnn, wn45a, "45")
+	wire wn45a ;
+	jnot not45(wn45a, wn45b) ;
+	rmem m45(sclk, reset, wm445, wmsnn, wn45a) ;
 
 	// M5
-	wn56b := g.NewWire()
-	s5 := g.NewAND(wn45a, wn56b, bos[4])
-	wm556 := g.NewWire()
-	m5 := NewNamedMemory(wn45a, wmsn, wm556, " 5")
+	wire wn56b, wm556 ;
+	jand s5(wn45a, wn56b, bos[4]) ;
+	rmem m5(sclk, reset, wn45a, wmsn, wm556) ;
 
 	// M56
-	wn56a := g.NewWire()
-	g.NewNOT(wn56a, wn56b)
-	m56 := NewNamedMemory(wm556, wmsnn, wn56a, "56")
+	wire wn56a ;
+	jnot not56(wn56a, wn56b) ;
+	rmem m56(sclk, reset, wm556, wmsnn, wn56a) ;
 
 	// M6
-	wn67b := g.NewWire()
-	s6 := g.NewAND(wn56a, wn67b, bos[5])
-	wm667 := g.NewWire()
-	m6 := NewNamedMemory(wn56a, wmsn, wm667, " 6")
+	wire wn67b, wm667 ;
+	jand s6(wn56a, wn67b, bos[5]) ;
+	rmem m6(sclk, reset, wn56a, wmsn, wm667) ;
 
 	// M67
-	g.NewNOT(bos.GetWire(6), wn67b)
-	m67 := NewNamedMemory(wm667, wmsnn, bos.GetWire(6), "67")
-	s7 := bos.GetWire(6) ;
+	jnot not67(bos[6], wn67b) ;
+	rmem m67(sclk, reset, wm667, wmsnn, bos[6]) ;
 	*/
-	
-	// Finally, loop step 7 to the reset Wire.
-	jbuf rloop(bos[6], wrst) ;
 
+	//jbuf rloop(bos[6], wrst) ;
 endmodule
+
+

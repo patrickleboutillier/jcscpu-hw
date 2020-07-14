@@ -6,6 +6,8 @@
 	reg [0:`OUTLEN+`INLEN-1] tvs[0:`NBLINES-1] ; // array of testvectors
 
 	initial begin // Will execute at the beginning once
+		$dumpfile(`DUMPFILE) ;
+		$dumpvars ;
 		$readmemb(`TVFILE, tvs) ; // Read vectors
 		tv = 0; errors = 0; // Initialize
 		reset = 1; #97; reset = 0; 
@@ -30,7 +32,9 @@
 	// apply test vectors on rising edge of tclk
 	reg [0:`OUTLEN-1] expected ;
 	always @(posedge tclk) begin
-		#1; {in[0:`INLEN-1], expected[0:`OUTLEN-1]} = tvs[tv] ;
+		if (~reset) begin
+			#1; {in[0:`INLEN-1], expected[0:`OUTLEN-1]} = tvs[tv] ;
+		end
 	end
 
 	// check results on falling edge of tclk

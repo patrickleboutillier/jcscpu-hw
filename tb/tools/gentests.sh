@@ -15,6 +15,7 @@ for f in tb/tv/*.tv ; do
 		echo ' `define VERBOSE '$VERBOSE
 		cat $f | grep ^// | sed 's/^\/\///'
 		echo ' `define TVFILE "'$f'"'
+		echo ' `define DUMPFILE "'tb/out/${g}.vcd'"'
 		NBLINES=$(grep ^[01xz] $f | wc -l)
 		echo ' `define NBLINES '$NBLINES
 		cat tb/tools/template.v

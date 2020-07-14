@@ -1,12 +1,12 @@
 // `define INLEN 1
-// `define OUTLEN 3
-// jclock x(sclk, reset, out[0], out[1], out[2]) ;
+// `define OUTLEN 4
+// jclock x(sclk, reset, out[0], out[1], out[2], out[3]) ;
 
-0_110
-0_111
-0_010
-0_000
-0_110
-0_111
-0_010
-0_000
+0_1010
+0_1111
+0_0110
+0_0000
+0_1010
+0_1111
+0_0110
+0_0000
