@@ -8,14 +8,30 @@
 module jcsbasic(
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
-    
+        
 	parameter 
 	   FIRST=0, 
 	   STEP=0, CLOCK=1, REG=2, MEM=3,
 	   BUF=4, NOT=5, NAND=6, AND=7, OR=8, XOR=9, ADD=10, CMP=11, LAST=11 ;  
     
+    
+    // jclock frequency (per tick)
+    localparam HZ = 1 ;
+    
+    // Power-on-reset lasts for 1 tick, in order to initialize the stepper properly.
+    reg reset = 1 ;
+    integer count = 0 ;
+    localparam max = (100000000 / HZ) + 1 ; 
+    always @(posedge CLK) begin
+        if (reset == 1 && count == max - 1) 
+            reset <= 0 ;
+        else
+            count <= count + 1 ;
+    end
+    
+    
     // Move to the next mode when nextmode is set.
-	reg [3:0] mode = BUF, nextmode = BUF ;
+	reg [3:0] mode = STEP, nextmode = STEP ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -44,15 +60,15 @@ module jcsbasic(
     
     // 1 HZ clock, slow so that we can see each tick with the LEDs
     wire clk_in ;
-    genclock #(1) gc(CLK, clk_in) ;
+    genclock #(HZ) gc(CLK, clk_in) ;
        
     // clock
     wire clk_out, clkd_out, clke_out, clks_out ;
-    jclock uclock(clk_in, 1'b0, clk_out, clkd_out, clke_out, clks_out) ; 
+    jclock uclock(clk_in, reset, clk_out, clkd_out, clke_out, clks_out) ; 
     
     // step
     wire [0:5] stp_out ;
-    jstepper ustepper(clk_out, 1'b0, stp_out) ; 
+    jstepper ustepper(clk_out, stp_out) ; 
 
      // reg
     wire [7:0] reg_out ;

@@ -1,24 +1,29 @@
 
 
-module jclock (input clk, input reset, output reg wclk, output reg wclkd, output wclke, output wclks) ;
-	reg settling ;
+module jclock (input clk, input reset, output wclk, output wclkd, output wclke, output wclks) ;
+	reg settling = 1 ;
+	reg rclk = 1 ;
+	reg rclkd = 0 ;
+	assign wclk = rclk ;
+	assign wclkd = rclkd ;
+	
 	always @(posedge clk) begin
 		if (reset) begin
-			wclk <= 1 ;
-			settling <= 1 ;
+			rclk <= 1 ;
 		end else if (! settling) begin
-			wclk <= ~wclk ;
+			rclk <= ~rclk ;
 		end
 	end
 
 	always @(negedge clk) begin
 		if (reset) begin
-			wclkd <= 0 ;
+			rclkd <= 0 ;
+			settling <= 1 ;
 		end else if (settling) begin
 			settling <= 0 ;
-			wclkd <= 1 ;
+			rclkd <= 1 ;
 		end else begin
-			wclkd <= ~wclkd ;
+			rclkd <= ~rclkd ;
 		end
 	end
 
@@ -28,7 +33,7 @@ endmodule
 
 
 `define SMEM jlatch
-module jstepper (input clk, input reset, output [0:5] bos) ;
+module jstepper (input clk, output [0:5] bos) ;
 	wire wrst, bos6 ;
 	// Loop around to wrst
 	assign wrst = bos6 ;
