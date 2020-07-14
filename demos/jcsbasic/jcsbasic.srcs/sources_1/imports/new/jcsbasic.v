@@ -5,19 +5,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module jcsdemo(
+module jcsbasic(
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
 	parameter 
-	   FIRST=6, 
-	   CLOCK=6, RAM=7, REG=8, MEM=9,
-	   BUF=10, NOT=11, NAND=12, AND=13, OR=14, XOR=15, ADD=16, CMP=17, 
-       SHR=18, SHL=19, NOTR=20, ANDR=21, ORR=22, XORR=23, 
-	   ADDR=24, ZERO=25, BUS1=26, LAST=26 ;  
+	   FIRST=0, 
+	   STEP=0, CLOCK=1, REG=2, MEM=3,
+	   BUF=4, NOT=5, NAND=6, AND=7, OR=8, XOR=9, ADD=10, CMP=11, LAST=11 ;  
     
     // Move to the next mode when nextmode is set.
-	reg [5:0] mode = BUF, nextmode = BUF ;
+	reg [3:0] mode = BUF, nextmode = BUF ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -47,17 +45,14 @@ module jcsdemo(
     // 1 HZ clock, slow so that we can see each tick with the LEDs
     wire clk_in ;
     genclock #(1) gc(CLK, clk_in) ;
-    
+       
     // clock
     wire clk_out, clkd_out, clke_out, clks_out ;
-    jclock uclock(clk_in, clk_out, clkd_out, clke_out, clks_out) ; 
+    jclock uclock(clk_in, 1'b0, clk_out, clkd_out, clke_out, clks_out) ; 
     
-    // RAM
-    wire [7:0] ram_io, ram_out ;
-    reg [7:0] ram_in ;
-    assign ram_out = ram_io ;
-    assign ram_io = (SET) ? SW[7:0] : 8'bzzzzzzzz ;
-    jRAM uram(SW[15:8], SETA, ram_io, SET, ENA) ;
+    // step
+    wire [0:5] stp_out ;
+    jstepper ustepper(clk_out, 1'b0, stp_out) ; 
 
      // reg
     wire [7:0] reg_out ;
@@ -99,45 +94,6 @@ module jcsdemo(
     wire cmp_out, cmp_eqo, cmp_alo ;
     jcmp ucmp(SW[1], SW[0], EQI, ALI, cmp_out, cmp_eqo, cmp_alo) ;
 
-    // shr
-    wire [7:0] shr_out ;
-    wire shr_co ;
-    jshiftr ushr(SW[7:0], CI, shr_out, shr_co) ;
-
-    // shl
-    wire [7:0] shl_out ;
-    wire shl_co ;
-    jshiftl ushl(SW[7:0], CI, shl_out, shl_co) ;
-
-    // notr
-    wire [7:0] notr_out ;
-    jnotter unotter(SW[7:0], notr_out) ;
-    
-    // andr
-    wire [7:0] andr_out ;
-    jandder uandder(SW[15:8], SW[7:0], andr_out) ;
-
-    // orr
-    wire [7:0] orr_out ;
-    jorer uorer(SW[15:8], SW[7:0], orr_out) ;
-
-    // xorr
-    wire [7:0] xorr_out ;
-	wire xorr_eqo, xorr_alo ;
-    jxorer uxorer(SW[15:8], SW[7:0], xorr_out, xorr_eqo, xorr_alo) ;
-        
-    // addr
-    wire [7:0] addr_out ;
-	wire addr_co ;
-    jadder uadder(SW[15:8], SW[7:0], CI, addr_out, addr_co) ;
-
-    // zero
-	wire zero_out ;
-    jzero uzero(SW[7:0], zero_out) ;
-
-    // zero
-	wire [7:0] bus1_out ;
-    jbus1 ubus1(SW[7:0], CI, bus1_out) ;
 
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
@@ -145,10 +101,11 @@ module jcsdemo(
     always @(*) begin
         // word = text[mode] ;
         case (mode)
-            RAM: begin
-                word = " ram" ;
-                LED[15:8] = 0 ;
-                LED[7:0] = ram_out ;
+             STEP: begin
+                word = "step" ;
+                LED[15:10] = stp_out ;
+                LED[9:4] = 0 ;
+                LED[3:0] = {clk_out, clkd_out, clke_out, clks_out} ;
             end
             CLOCK: begin
                 word = " clk" ;
@@ -206,55 +163,6 @@ module jcsdemo(
                 LED[15:12] = {1'b0, cmp_alo, cmp_eqo, 1'b0} ;
                 LED[11:1] = 0 ;
                 LED[0] = cmp_out ;
-            end
-            SHR: begin
-                word = " shr" ;
-                LED[15] = shr_co ;
-                LED[14:8] = 0 ;
-                LED[7:0] = shr_out ;
-            end
-            SHL: begin
-                word = " shl" ;
-                LED[15] = shl_co ;
-                LED[14:8] = 0 ;
-                LED[7:0] = shl_out ;
-            end
-            NOTR: begin
-                word = "notr" ;
-                LED[15:8] = 0 ;
-                LED[7:0] = notr_out ;
-            end
-            ANDR: begin
-                word = "andr" ;
-                LED[15:8] = 0 ;
-                LED[7:0] = andr_out ;
-            end
-            ORR: begin
-                word = " orr" ;
-                LED[15:8] = 0 ;
-                LED[7:0] = orr_out ;
-            end
-            XORR: begin
-                word = "xorr" ;
-                LED[15:12] = {1'b0, xorr_alo, xorr_eqo, 1'b0} ;
-                LED[11:8] = 0 ;
-                LED[7:0] = xorr_out ;
-            end
-            ADDR: begin
-                word = "addr" ;
-                LED[15:12] = {addr_co, 3'b000} ;
-                LED[11:8] = 0 ;
-                LED[7:0] = addr_out ;
-            end
-            ZERO: begin
-                word = "zero" ;
-                LED[15:12] = {3'b000, zero_out} ;
-                LED[11:0] = 0 ;
-            end
-            BUS1: begin
-                word = "bus1" ;
-                LED[15:8] = 0 ;
-                LED[7:0] = bus1_out ;
             end
             default: begin
                 word = "    " ;

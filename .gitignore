@@ -1,7 +1,7 @@
-jcsdemo/jcsdemo.cache/
-jcsdemo/jcsdemo.runs/
-jcsdemo/jcsdemo.hw/
-jcsdemo/jcsdemo.ip_user_files/
-jcsdemo/jcsdemo.xpr
+*.cache/
+*.runs/
+*.hw/
+*.ip_user_files/
+*.xpr
 a.out
 out/
