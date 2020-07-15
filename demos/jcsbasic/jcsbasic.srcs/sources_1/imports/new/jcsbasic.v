@@ -51,12 +51,12 @@ module jcsbasic(
 
 
     // Aliases for push buttons
-    wire CI, EQI, ALI ;
+    wire CI, EQI, ALI, ENAB ;
     assign CI = BTNL ;
     assign ALI = BTNC ;
     assign EQI = BTNR ;
     assign SET = BTNL ;
-    assign ENA = BTNR ;
+    assign ENAB = BTNR ;
     
     // 1 HZ clock, slow so that we can see each tick with the LEDs
     wire clk_in ;
@@ -72,7 +72,7 @@ module jcsbasic(
 
     // ena
     wire [7:0] ena_out ;
-    jenabler uena(SW[7:0], ENA, ena_out) ;
+    jenabler uena(SW[7:0], ENAB, ena_out) ;
 
     // reg
     wire [7:0] reg_out ;
