@@ -13,6 +13,7 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * step
 * clk
 * reg
+* ena
 * mem
 * **buf**
 * not
@@ -111,6 +112,12 @@ LEDs are used to indicate the output values for the various components.
 * i = _SW1_
 * s = _SW0_
 * o = _LD0_
+
+### ena(I, e) => (O)
+"ena" connects the inputs and the output with a ENABLER circuit (page 40).
+* I = _SW[7:0]_
+* e = _ENA_
+* O = _LD[7:0]_
 
 ### reg(I, s, e) => (O)
 "reg" connects the inputs and the output with a REGISTER circuit (page 41).
