@@ -32,7 +32,7 @@ module jcsbasic(
     
     
     // Move to the next mode when nextmode is set.
-	reg [3:0] mode = STEP, nextmode = STEP ;
+	reg [3:0] mode = BUF, nextmode = BUF ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
