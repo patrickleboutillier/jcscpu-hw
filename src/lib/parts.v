@@ -63,6 +63,13 @@ module jrreg(input clk, input [7:0] bis, input ws, input we, inout [7:0] bos) ;
 endmodule
 
 
+module jena(input wi, input we, inout wo) ;
+	wire out ;
+	jand a(wi, we, out) ;
+	assign wo = (we) ? out : 1'bz ;
+endmodule
+
+
 module jenabler(input [7:0] bis, input we, inout [7:0] bos) ;
 	genvar j ;
 	generate

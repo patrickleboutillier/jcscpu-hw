@@ -22,13 +22,14 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * xor
 * add
 * cmp
+* dec3
 
 ## Push buttons (callout #7)
 * _BTNU_: The top button is used to move to the previous demo mode.* 
 * _BTND_: The bottom button is used to move to the previous demo mode.
 * _BTNL_: When pressed, sets the "carry in" (_CI_) input to 1 for the various circuits that use it. Also used as the _SET_ button for memories. 
 * _BTNC_: When pressed, sets the "a-larger in" (_ALI_) input to 1 for the various circuits that use it.
-* _BTNR_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various circuits that use it. Also used as the _ENA_ button for registers.
+* _BTNR_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various circuits that use it. Also used as the _ENA_ button for enablers and registers.
 
 ## Switches (_SW15_ through _SW0_) (callout #5)
 Switches are used to control the input bits to the various components. Most of the time, _SW[7:0]_ are used, with _SW[15:8]_ begin added if the circuit requires 2 bytes of inputs.
@@ -97,6 +98,12 @@ LEDs are used to indicate the output values for the various components.
 * alo = _ALO_
 * co = _CO_
 
+### dec3(I) => (O)
+"dec3" connects the input and the outputs with a DECODER(3x8) circuit (page 48).
+* I = _SW[2:0]_
+* O = _LD[7:0]_
+
+
 ## Memory and sequantial circuits
 
 ### mem(i, s) => (o)
@@ -120,6 +127,6 @@ LEDs are used to indicate the output values for the various components.
 * clks = _LD0_
 
 ### step(clk) => (O)
-"step" implements a STEPPER (page 102). The stepper used latch-based memories as the initial value must be initialized to 0.
+"step" implements a STEPPER (page 102). The stepper uses latch-based memories as the power-on value must be initialized to 0.
 * clk = _LD[3:0]_
 * O = _LD[15:10]_
