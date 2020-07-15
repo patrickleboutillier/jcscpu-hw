@@ -11,8 +11,8 @@ module jcsbasic(
         
 	parameter 
 	   FIRST=0, 
-	   STEP=0, CLOCK=1, REG=2, MEM=3,
-	   BUF=4, NOT=5, NAND=6, AND=7, OR=8, XOR=9, ADD=10, CMP=11, LAST=11 ;  
+	   STEP=0, CLOCK=1, REG=2, ENA=3, MEM=4,
+	   BUF=5, NOT=6, NAND=7, AND=8, OR=9, XOR=10, ADD=11, CMP=12, DEC3=13, LAST=13 ;  
     
     
     // jclock frequency (per tick)
@@ -70,10 +70,14 @@ module jcsbasic(
     wire [0:5] stp_out ;
     jstepper ustepper(clk_out, 1'b0, stp_out) ; 
 
-     // reg
+    // ena
+    wire [7:0] ena_out ;
+    jenabler uena(SW[7:0], ENA, ena_out) ;
+
+    // reg
     wire [7:0] reg_out ;
     jregister ureg(SW[7:0], SET, ENA, reg_out) ;
-        
+    
     // mem
     wire mem_out ;
     jmemory umemory(SW[0], SET, mem_out) ;
@@ -110,6 +114,9 @@ module jcsbasic(
     wire cmp_out, cmp_eqo, cmp_alo ;
     jcmp ucmp(SW[1], SW[0], EQI, ALI, cmp_out, cmp_eqo, cmp_alo) ;
 
+	// dec3
+	wire [7:0] dec3_out ;
+	jdecoder #(3, 8) udec(SW[2:0], dec3_out) ;
 
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
@@ -127,6 +134,11 @@ module jcsbasic(
                 word = " clk" ;
                 LED[15:4] = 0 ;
                 LED[3:0] = {clk_out, clkd_out, clke_out, clks_out} ;
+            end
+            ENA: begin
+                word = " ena" ;
+                LED[15:8] = 0 ;
+				LED[7:0] = ena_out ;
             end
             REG: begin
                 word = " reg" ;
@@ -179,6 +191,11 @@ module jcsbasic(
                 LED[15:12] = {1'b0, cmp_alo, cmp_eqo, 1'b0} ;
                 LED[11:1] = 0 ;
                 LED[0] = cmp_out ;
+            end
+            DEC3: begin
+                word = "dec3" ;
+				LED[15:8] = 0 ;
+				LED[7:0] = dec3_out ;
             end
             default: begin
                 word = "    " ;
