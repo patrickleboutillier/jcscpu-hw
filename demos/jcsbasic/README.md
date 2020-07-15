@@ -29,7 +29,7 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * _BTND_: The bottom button is used to move to the previous demo mode.
 * _BTNL_: When pressed, sets the "carry in" (_CI_) input to 1 for the various circuits that use it. Also used as the _SET_ button for memories. 
 * _BTNC_: When pressed, sets the "a-larger in" (_ALI_) input to 1 for the various circuits that use it.
-* _BTNR_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various circuits that use it. Also used as the _ENA_ button for registers.
+* _BTNR_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various circuits that use it. Also used as the _ENA_ button for enablers and registers.
 
 ## Switches (_SW15_ through _SW0_) (callout #5)
 Switches are used to control the input bits to the various components. Most of the time, _SW[7:0]_ are used, with _SW[15:8]_ begin added if the circuit requires 2 bytes of inputs.
