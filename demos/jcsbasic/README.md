@@ -26,9 +26,9 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 ## Push buttons (callout #7)
 * _BTNU_: The top button is used to move to the previous demo mode.* 
 * _BTND_: The bottom button is used to move to the previous demo mode.
-* _BTNL_: When pressed, sets the "carry in" (_CI_) input to 1 for the various circuits that use it.
+* _BTNL_: When pressed, sets the "carry in" (_CI_) input to 1 for the various circuits that use it. Also used as the _SET_ button for memories. 
 * _BTNC_: When pressed, sets the "a-larger in" (_ALI_) input to 1 for the various circuits that use it.
-* _BTNR_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various circuits that use it.
+* _BTNR_: When pressed, sets the "equal in" (_EQI_) input to 1 for the various circuits that use it. Also used as the _ENA_ button for registers.
 
 ## Switches (_SW15_ through _SW0_) (callout #5)
 Switches are used to control the input bits to the various components. Most of the time, _SW[7:0]_ are used, with _SW[15:8]_ begin added if the circuit requires 2 bytes of inputs.
@@ -100,32 +100,26 @@ LEDs are used to indicate the output values for the various components.
 ## Memory and sequantial circuits
 
 ### mem(i, s) => (o)
-"or" connects the inputs and the output with an OR circuit (page 69).
-* a = _SW1_
-* b = _SW0_
-* c = _LD0_
+"mem" connects the inputs and the output with an MEMORY circuit (page 24).
+* i = _SW1_
+* s = _SW0_
+* o = _LD0_
 
 ### reg(I, s, e) => (O)
-"xor" connects the inputs and the output with a XOR circuit (page 70).
-* a = _SW1_
-* b = _SW0_
-* c = _LD0_
+"reg" connects the inputs and the output with a REGISTER circuit (page 41).
+* I = _SW[7:0]_
+* s = _SET_
+* e = _ENA_
+* O = _LD[7:0]_
 
 ### clk => (clk, clkd, clke, clks)
-"add" connects the inputs and the outputs with a ADD circuit (page 80).
-* a = _SW1_
-* b = _SW0_
-* ci = _CI_
-* c = _LD0_
-* co = _CO_
+"clk" provides a CLOCK signal (page 96), sourced (and divided) using the onboard 100MHz clock.
+* clk = _LD3_
+* clkd = _LD2_
+* clke = _LD1_
+* clks = _LD0_
 
-### step => (O)
-"cmp" connects the inputs and the outputs with a CMP circuit (page 83).
-* a = _SW1_
-* b = _SW0_
-* eqi = _EQI_
-* ali = _ALI_
-* c = _LD0_
-* eqo = _EQO_
-* alo = _ALO_
-* co = _CO_
+### step(clk) => (O)
+"step" implements a STEPPER (page 102). The stepper used latch-based memories as the initial value must be initialized to 0.
+* clk = _LD[3:0]_
+* O = _LD[15:10]_
