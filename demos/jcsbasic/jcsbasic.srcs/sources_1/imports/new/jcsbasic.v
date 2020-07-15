@@ -16,7 +16,7 @@ module jcsbasic(
     
     
     // jclock frequency (per tick)
-    localparam HZ = 4 ;
+    localparam HZ = 2 ;
     
     // Power-on-reset lasts for 1 halfqtick, in order to initialize the stepper properly.
     reg reset = 1 ;
@@ -56,7 +56,6 @@ module jcsbasic(
     assign ALI = BTNC ;
     assign EQI = BTNR ;
     assign SET = BTNL ;
-    assign SETA = BTNC ;
     assign ENA = BTNR ;
     
     // 1 HZ clock, slow so that we can see each tick with the LEDs
