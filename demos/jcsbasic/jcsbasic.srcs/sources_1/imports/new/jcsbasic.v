@@ -16,12 +16,13 @@ module jcsbasic(
     
     
     // jclock frequency (per tick)
-    localparam HZ = 1 ;
+    localparam HZ = 4 ;
     
-    // Power-on-reset lasts for 1 tick, in order to initialize the stepper properly.
+    // Power-on-reset lasts for 1 halfqtick, in order to initialize the stepper properly.
     reg reset = 1 ;
     integer count = 0 ;
-    localparam max = (100000000 / HZ) + 1 ; 
+    localparam halfqtick = (100000000 / HZ) / 2 ;
+    localparam max = 3 * halfqtick ; 
     always @(posedge CLK) begin
         if (reset == 1 && count == max - 1) 
             reset <= 0 ;

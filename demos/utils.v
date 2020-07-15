@@ -117,7 +117,5 @@ module genclock #(parameter HZ=1) (input clkin, output reg clkout) ;
     always @ (posedge clkin) begin
         if (count == max - 1)
             clkout <= ~clkout ;
-        else
-            clkout <= clkout ;
     end
 endmodule
