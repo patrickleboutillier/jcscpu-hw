@@ -1,5 +1,7 @@
 
-
+/*
+    The clock is a bit tricky as it must start high and kick off the stepper at a very specific place.
+*/
 module jclock (input clk, input reset, output wclk, output wclkd, output wclke, output wclks) ;
 	reg settling = 1 ;
 	reg rclk = 1 ;
@@ -33,9 +35,11 @@ endmodule
 
 
 `define SMEM jlatch
-module jstepper (input clk, output [0:5] bos) ;
+module jstepper (input clk, input reset, output [0:5] bos) ;
 	wire wrst, bos6 ;
 	// Loop around to wrst
+	// jmemory mrst(1'b0, bos6, w1) ;
+	// jor rst(bos6, w1, wrst) ;
 	assign wrst = bos6 ;
 
 	wire wnrm1, wnco1, wmsn, wmsnn ;

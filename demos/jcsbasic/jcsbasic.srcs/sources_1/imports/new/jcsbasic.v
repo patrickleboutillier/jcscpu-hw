@@ -68,7 +68,7 @@ module jcsbasic(
     
     // step
     wire [0:5] stp_out ;
-    jstepper ustepper(clk_out, stp_out) ; 
+    jstepper ustepper(clk_out, 1'b0, stp_out) ; 
 
      // reg
     wire [7:0] reg_out ;
