@@ -126,21 +126,6 @@ module jzero (input [7:0] bis, output wz) ;
 endmodule
 
 
-module jbus1 (input [7:0] bis, input wbit1, output [7:0] bos) ;
-	wire wnbit1 ;
-	jnot n(wbit1, wnbit1) ;
-
-	genvar j ;
-	for (j = 0 ; j < 8 ; j = j + 1) begin
-		if (j > 0) begin
-			jand andj(bis[j], wnbit1, bos[j]) ;
-		end else begin
-			jor orj(bis[j], wbit1, bos[j]) ;
-		end
-	end
-endmodule
-
-
 module jadd(input wa, input wb, input wci, output wc, output wco) ;
         wire wi, wcoa, wcob ;
         jxor xor1(wa, wb, wi) ;

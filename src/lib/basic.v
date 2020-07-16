@@ -1,7 +1,9 @@
+`timescale 1ns / 1ps
 
 
 module jnand(input wa, input wb, output wc) ;
-	nand x(wc, wa, wb) ;
+	//#35 nand x(wc, wa, wb) ;
+	assign #1 wc = wa ~& wb ;
 endmodule
 
 

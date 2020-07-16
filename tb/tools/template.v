@@ -10,30 +10,30 @@
 		$dumpvars ;
 		$readmemb(`TVFILE, tvs) ; // Read vectors
 		tv = 0; errors = 0; // Initialize
-		reset = 1; #97; reset = 0; 
+		reset = 1; #970; reset = 0; 
 	end
 
 	// generate test clock
 	reg tclk ;
 	always begin 
-		tclk = 1; #10; tclk = 0; #10; // 20ns period
+		tclk = 1; #100; tclk = 0; #100; // 200ns period
 	end
 
 	// generate system clock
 	always begin
 		sclk = 1 ;
-		#5 ;
+		#50 ;
 		sclk = 0 ;
-		#20 ;
+		#200 ;
 		sclk = 1 ;
-		#15 ; // 40ns period
+		#150 ; // 400ns period
 	end
 
 	// apply test vectors on rising edge of tclk
 	reg [0:`OUTLEN-1] expected ;
 	always @(posedge tclk) begin
 		if (~reset) begin
-			#1; {in[0:`INLEN-1], expected[0:`OUTLEN-1]} = tvs[tv] ;
+			#10; {in[0:`INLEN-1], expected[0:`OUTLEN-1]} = tvs[tv] ;
 		end
 	end
 

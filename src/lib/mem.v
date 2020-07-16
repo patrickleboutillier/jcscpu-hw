@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 
 // Gate-based memory as shown in the book 
 module jmemory(input wi, input ws, output wo) ;
@@ -15,7 +17,7 @@ module jlatch(input wi, input ws, output wo) ;
 	assign wo = ro ;
     always @(wi or ws) begin
         if (ws)
-            ro <= wi ;
+            ro <= #5 wi ;
     end
 endmodule
 

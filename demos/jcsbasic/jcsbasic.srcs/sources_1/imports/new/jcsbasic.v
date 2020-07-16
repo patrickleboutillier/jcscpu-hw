@@ -79,50 +79,48 @@ module jcsbasic(
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(*) begin
+        LED[15:8] = 0 ;
         case (mode)
             BUF: begin
                 word = " buf" ;
-                LED[15:1] = 0 ;
+                LED[7:1] = 0 ;
                 LED[0] = buf_out ;
             end
             NOT: begin
                 word = " not" ;
-                LED[15:1] = 0 ;
+                LED[7:1] = 0 ;
                 LED[0] = not_out ;
             end
             NAND: begin
                  word = "nand" ;
-                LED[15:1] = 0 ;
+                LED[7:1] = 0 ;
                 LED[0] = nand_out ;
             end
             AND: begin
                 word = " and" ;
-                LED[15:1] = 0 ;
+                LED[7:1] = 0 ;
                 LED[0] = and_out ;
             end
             OR: begin
                 word = "  or" ;
-                LED[15:1] = 0 ;
+                LED[7:1] = 0 ;
                 LED[0] = or_out ;
             end
             XOR: begin
                 word = " xor" ;
-                LED[15:1] = 0 ;
+                LED[7:1] = 0 ;
                 LED[0] = xor_out ;
             end
             DEC3: begin
                 word = "dec3" ;
-				LED[15:8] = 0 ;
 				LED[7:0] = dec3_out ;
             end
             ENABLE: begin
                 word = " ena" ;
-                LED[15:8] = 0 ;
 				LED[7:0] = ena_out ;
             end
             BUS1: begin
                 word = "bus1" ;
-                LED[15:8] = 0 ;
 				LED[7:0] = bus1_out ;
             end
             default: begin
