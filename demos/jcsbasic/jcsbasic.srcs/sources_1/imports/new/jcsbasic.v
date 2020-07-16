@@ -11,28 +11,11 @@ module jcsbasic(
         
 	parameter 
 	   FIRST=0, 
-	   STEP=0, CLOCK=1, REG=2, ENABLE=3, MEM=4,
-	   BUF=5, NOT=6, NAND=7, AND=8, OR=9, XOR=10, ADD=11, CMP=12, DEC3=13, LAST=13 ;  
-    
-    
-    // jclock frequency (per tick)
-    localparam HZ = 2 ;
-    
-    // Power-on-reset lasts for 3 halfqticks, in order to initialize the stepper properly.
-    reg reset = 1 ;
-    integer count = 0 ;
-    localparam halfqtick = (100000000 / HZ) / 2 ;
-    localparam max = 3 * halfqtick ; 
-    always @(posedge CLK) begin
-        if (reset == 1 && count == max - 1) 
-            reset <= 0 ;
-        else
-            count <= count + 1 ;
-    end
-    
-    
+	   BUF=0, NOT=1, NAND=2, AND=3, OR=4, XOR=5, DEC3=6, ENABLE=7, BUS1=8, LAST=8 ;  
+   
+        
     // Move to the next mode when nextmode is set.
-	reg [3:0] mode = STEP, nextmode = STEP ;
+	reg [3:0] mode = BUF, nextmode = BUF ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -51,36 +34,10 @@ module jcsbasic(
 
 
     // Aliases for push buttons
-    wire CI, ALI, EQI, SET, ENA ;
-    assign CI = BTNL ;
-    assign ALI = BTNC ;
-    assign EQI = BTNR ;
-    assign SET = BTNL ;
-    assign ENA = BTNR ;
+    wire BIT1, ENA ;
+    assign ENA = BTNL ;
+    assign BIT1 = BTNL ;
     
-    // 1 HZ clock, slow so that we can see each tick with the LEDs
-    wire clk_in ;
-    genclock #(HZ) gc(CLK, clk_in) ;
-       
-    // clock
-    wire clk_out, clkd_out, clke_out, clks_out ;
-    jclock uclock(clk_in, reset, clk_out, clkd_out, clke_out, clks_out) ; 
-    
-    // step
-    wire [0:5] stp_out ;
-    jstepper ustepper(clk_out, 1'b0, stp_out) ; 
-
-    // ena
-    wire [7:0] ena_out ;
-    //jenabler uena(SW[7:0], ENA, ena_out) ;
-
-    // reg
-    wire [7:0] reg_out ;
-    jregister ureg(SW[7:0], SET, ENA, reg_out) ;
-    
-    // mem
-    wire mem_out ;
-    jmemory umemory(SW[0], SET, mem_out) ;
              
     // buf
     wire buf_out ;
@@ -106,50 +63,23 @@ module jcsbasic(
     wire xor_out ;
     jxor uxor(SW[1], SW[0], xor_out) ;
 
-    // add
-    wire add_out, add_co ;
-    jadd uadd(SW[1], SW[0], CI, add_out, add_co) ;
-
-    // cmp
-    wire cmp_out, cmp_eqo, cmp_alo ;
-    jcmp ucmp(SW[1], SW[0], EQI, ALI, cmp_out, cmp_eqo, cmp_alo) ;
-
 	// dec3
 	wire [7:0] dec3_out ;
-	// jdecoder #(3, 8) udec(SW[2:0], dec3_out) ;
-
+	jdecoder #(3, 8) udec(SW[2:0], dec3_out) ;
+	
+	// ena
+	wire [7:0] ena_out ;
+	jenabler uenabler(SW[7:0], ENA, ena_out) ;
+	
+	// bus1
+	wire [7:0] bus1_out ;
+	jbus1 ubus1(SW[7:0], BIT1, bus1_out) ;
 
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(*) begin
         case (mode)
-             STEP: begin
-                word = "step" ;
-                LED[15:10] = stp_out ;
-                LED[9:4] = 0 ;
-                LED[3:0] = {clk_out, clkd_out, clke_out, clks_out} ;
-            end
-            CLOCK: begin
-                word = " clk" ;
-                LED[15:4] = 0 ;
-                LED[3:0] = {clk_out, clkd_out, clke_out, clks_out} ;
-            end
-            ENABLE: begin
-                word = " ena" ;
-                LED[15:8] = 0 ;
-				LED[7:0] = ena_out ;
-            end
-            REG: begin
-                word = " reg" ;
-                LED[15:8] = 0 ;
-                LED[7:0] = reg_out ;
-            end
-            MEM: begin
-                word = " mem" ;
-                LED[15:1] = 0 ;
-                LED[0] = mem_out ;
-            end
             BUF: begin
                 word = " buf" ;
                 LED[15:1] = 0 ;
@@ -180,22 +110,20 @@ module jcsbasic(
                 LED[15:1] = 0 ;
                 LED[0] = xor_out ;
             end
-            ADD: begin
-                word = " add" ;
-                LED[15:12] = {add_co, 3'b000} ;
-                LED[11:1] = 0 ;
-                LED[0] = add_out ;
-            end
-            CMP: begin
-                word = " cmp" ;
-                LED[15:12] = {1'b0, cmp_alo, cmp_eqo, 1'b0} ;
-                LED[11:1] = 0 ;
-                LED[0] = cmp_out ;
-            end
             DEC3: begin
                 word = "dec3" ;
 				LED[15:8] = 0 ;
 				LED[7:0] = dec3_out ;
+            end
+            ENABLE: begin
+                word = " ena" ;
+                LED[15:8] = 0 ;
+				LED[7:0] = ena_out ;
+            end
+            BUS1: begin
+                word = "bus1" ;
+                LED[15:8] = 0 ;
+				LED[7:0] = bus1_out ;
             end
             default: begin
                 word = "    " ;
