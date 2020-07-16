@@ -36,11 +36,11 @@ endmodule
 
 `define SMEM jlatch
 module jstepper (input clk, input reset, output [0:5] bos) ;
-	wire wrst, bos6 ;
+	wire wrst ;
 	// Loop around to wrst
 	// jmemory mrst(1'b0, bos6, w1) ;
 	// jor rst(bos6, w1, wrst) ;
-	assign wrst = bos6 ;
+	// assign wrst = bos6 ;
 
 	wire wnrm1, wnco1, wmsn, wmsnn ;
 	jnot not1(wrst, wnrm1) ;
@@ -104,8 +104,8 @@ module jstepper (input clk, input reset, output [0:5] bos) ;
 	`SMEM m6(wn56a, wmsn, wm667) ;
 
 	// M67
-	jnot not67(bos6, wn67b) ;
-	`SMEM m67(wm667, wmsnn, bos6) ;
+	jnot not67(wrst, wn67b) ;
+	`SMEM m67(wm667, wmsnn, wrst) ;
 endmodule
 
 

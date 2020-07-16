@@ -11,14 +11,14 @@ module jcsbasic(
         
 	parameter 
 	   FIRST=0, 
-	   STEP=0, CLOCK=1, REG=2, ENA=3, MEM=4,
+	   STEP=0, CLOCK=1, REG=2, ENABLE=3, MEM=4,
 	   BUF=5, NOT=6, NAND=7, AND=8, OR=9, XOR=10, ADD=11, CMP=12, DEC3=13, LAST=13 ;  
     
     
     // jclock frequency (per tick)
     localparam HZ = 2 ;
     
-    // Power-on-reset lasts for 1 halfqtick, in order to initialize the stepper properly.
+    // Power-on-reset lasts for 3 halfqticks, in order to initialize the stepper properly.
     reg reset = 1 ;
     integer count = 0 ;
     localparam halfqtick = (100000000 / HZ) / 2 ;
@@ -32,7 +32,7 @@ module jcsbasic(
     
     
     // Move to the next mode when nextmode is set.
-	reg [3:0] mode = BUF, nextmode = BUF ;
+	reg [3:0] mode = STEP, nextmode = STEP ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -51,12 +51,12 @@ module jcsbasic(
 
 
     // Aliases for push buttons
-    wire CI, EQI, ALI, ENAB ;
+    wire CI, ALI, EQI, SET, ENA ;
     assign CI = BTNL ;
     assign ALI = BTNC ;
     assign EQI = BTNR ;
     assign SET = BTNL ;
-    assign ENAB = BTNR ;
+    assign ENA = BTNR ;
     
     // 1 HZ clock, slow so that we can see each tick with the LEDs
     wire clk_in ;
@@ -72,7 +72,7 @@ module jcsbasic(
 
     // ena
     wire [7:0] ena_out ;
-    jenabler uena(SW[7:0], ENAB, ena_out) ;
+    //jenabler uena(SW[7:0], ENA, ena_out) ;
 
     // reg
     wire [7:0] reg_out ;
@@ -116,13 +116,13 @@ module jcsbasic(
 
 	// dec3
 	wire [7:0] dec3_out ;
-	jdecoder #(3, 8) udec(SW[2:0], dec3_out) ;
+	// jdecoder #(3, 8) udec(SW[2:0], dec3_out) ;
+
 
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(*) begin
-        // word = text[mode] ;
         case (mode)
              STEP: begin
                 word = "step" ;
@@ -135,7 +135,7 @@ module jcsbasic(
                 LED[15:4] = 0 ;
                 LED[3:0] = {clk_out, clkd_out, clke_out, clks_out} ;
             end
-            ENA: begin
+            ENABLE: begin
                 word = " ena" ;
                 LED[15:8] = 0 ;
 				LED[7:0] = ena_out ;
