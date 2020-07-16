@@ -139,3 +139,24 @@ module jbus1 (input [7:0] bis, input wbit1, output [7:0] bos) ;
 		end
 	end
 endmodule
+
+
+module jadd(input wa, input wb, input wci, output wc, output wco) ;
+        wire wi, wcoa, wcob ;
+        jxor xor1(wa, wb, wi) ;
+        jxor xor2(wi, wci, wc) ;
+        jand and1(wci, wi, wcoa) ;
+        jand and2(wa, wb, wcob) ;
+        jor or1(wcoa, wcob, wco) ;
+endmodule
+
+
+module jcmp(input wa, input wb, input weqi, input wali, output wc, output weqo, output walo) ;
+        wire w23, w45 ;
+        jxor xor1(wa, wb, wc) ;
+        jnot not1(wc, w23) ;
+        jand and1(weqi, w23, weqo) ;
+        jandN #(3) and3({weqi, wa, wc}, w45) ;
+        jor or1(wali, w45, walo) ;
+endmodule
+
