@@ -2,8 +2,8 @@
 
 
 module jnand(input wa, input wb, output wc) ;
-	//#35 nand x(wc, wa, wb) ;
-	assign #1 wc = wa ~& wb ;
+	// Use this style to allow for simulation delays. 
+	assign #1 wc = ~(wa & wb) ;
 endmodule
 
 
