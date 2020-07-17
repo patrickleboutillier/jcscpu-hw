@@ -38,14 +38,13 @@ endmodule
 module jstepper (input clk, input reset, output [0:5] bos) ;
 	wire wrst, bos6 ;
 	// Loop around to wrst
-	// jmemory mrst(1'b0, bos6, w1) ;
-	// jor rst(bos6, w1, wrst) ;
 	assign wrst = bos6 ;
 
 	wire wnrm1, wnco1, wmsn, wmsnn ;
 	jnot not1(wrst, wnrm1) ;
 	jnot not2(clk, wnco1) ;
-	jor or1(wrst, wnco1, wmsn) ;
+	//jor or1(wrst, wnco1, wmsn) ;
+	assign #1 wmsn = wrst | wnco1 ;
 	jor or2(wrst, clk, wmsnn) ;
 
 	// M1

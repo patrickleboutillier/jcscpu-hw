@@ -1,7 +1,2 @@
-*.cache/
-*.runs/
-*.hw/
-*.ip_user_files/
-*.xpr
 a.out
 out/

@@ -11,7 +11,7 @@ module jcsalu(
     
 	parameter 
 	   FIRST=0, 
-       ADDR=0, SHR=1, SHL=2, NOTR=3, ANDR=4, ORR=5, XORR=6, ZERO=7, BUS1=8, LAST=8 ;
+	   ADDR=0, SHR=1, SHL=2, NOTR=3, ANDR=4, ORR=5, XORR=6, LAST=6 ;
     
     // Move to the next mode when nextmode is set.
 	reg [5:0] mode = ADDR, nextmode = ADDR ;
@@ -35,23 +35,22 @@ module jcsalu(
     // Aliases for push buttons
     wire CI, EQI, ALI ;
     assign CI = BTNL ;
-    assign ALI = BTNC ;
-    assign EQI = BTNR ;
-
-	reg [2:0] ops = 0 ;
-	wire alu_co, alu_eqo, alu_alo, alu_z ;
-	jALU x(SW[7:0], SW[15:8], CI, ops, LED[7:0], alu_co, alu_eqo, alu_alo, alu_z) ;
-
+    
+    reg [2:0] ops = 0 ;
+    wire [7:0] alu_out ;
+    wire alu_co, alu_alo, alu_eqo, alu_z ;
+    jALU ualu(SW[7:0], SW[15:8], CI, ops, alu_out, alu_co, alu_eqo, alu_alo, alu_z) ;
 
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(*) begin
-		ops = mode ;
-		LED[15:12] = {alu_co, alu_eqo, alu_alo, alu_z} ;
-		LED[11:9] = ops ;
-		LED[8] = 0 ;
-	    case (mode)
+        ops = mode ;
+        LED[15:12] = {alu_co, alu_alo, alu_eqo, alu_z} ;
+        LED[11] = 0 ;
+        LED[10:8] = ops ;
+        LED[7:0] = alu_out ;
+        case (mode)
             ADDR: begin
                 word = "addr" ;
             end

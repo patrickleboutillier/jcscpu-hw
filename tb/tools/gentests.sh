@@ -9,7 +9,7 @@ fi
 for f in tb/tv/*.tv ; do
 	g=`basename $f .tv`
 	{
-		echo '`timescale 1ns/1ps'
+		echo '`timescale 1ns / 1ps'
 		echo 
 		echo "module test() ;"
 		echo

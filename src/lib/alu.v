@@ -46,45 +46,102 @@ module jALU (input [7:0] bas, input [7:0] bbs, input wci, input [2:0] bops,
 endmodule
 
 
-/*
-func NewALU(bas *g.Bus, bbs *g.Bus, wci *g.Wire, bops *g.Bus, bcs *g.Bus, wco *g.Wire, weqo *g.Wire, walo *g.Wire, wz *g.Wire) *ALU {
-	// Build the ALU circuit
-	bdec := g.NewBus(8)
-	NewDecoder(bops, bdec)
-	bdec.GetWire(7).SetPower(false)
-	bdec.GetWire(7).SetTerminal()
+module jshiftr (input [0:7] bis, input wci, output [0:7] bos, output wco) ;
+	jbuf b0(wci, bos[0]) ;
+	
+	genvar j ;
+	for (j = 1; j < 8 ; j = j + 1) begin
+		jbuf bj(bis[j-1], bos[j]) ;
+	end
+	jbuf bn(bis[7], wco) ;
+endmodule
 
-	bxor := g.NewBus(bas.GetSize())
-	NewXORer(bas, bbs, bxor, weqo, walo)
-	NewEnabler(bxor, bdec.GetWire(6), bcs)
 
-	bor := g.NewBus(bas.GetSize())
-	NewORer(bas, bbs, bor)
-	NewEnabler(bor, bdec.GetWire(5), bcs)
+module jshiftl (input [0:7] bis, input wci, output [0:7] bos, output wco) ;
+	jbuf b0(bis[0], wco) ;
+	
+	genvar j ;
+	for (j = 1; j < 8 ; j = j + 1) begin
+		jbuf bj(bis[j], bos[j-1]) ;
+	end
+	jbuf bn(wci, bos[7]) ;
+endmodule
 
-	band := g.NewBus(bas.GetSize())
-	NewANDder(bas, bbs, band)
-	NewEnabler(band, bdec.GetWire(4), bcs)
 
-	bnot := g.NewBus(bas.GetSize())
-	NewNOTter(bas, bnot)
-	NewEnabler(bnot, bdec.GetWire(3), bcs)
+module jnotter (input [7:0] bis, output [7:0] bos) ;
+	genvar j ;
+	for (j = 0; j < 8 ; j = j + 1) begin
+		jnot nj(bis[j], bos[j]) ;
+	end
+endmodule
 
-	bshl := g.NewBus(bas.GetSize())
-	woshl := g.NewWire()
-	NewShiftLeft(bas, wci, bshl, woshl)
-	g.NewAND(woshl, bdec.GetWire(2), wco)
-	NewEnabler(bshl, bdec.GetWire(2), bcs)
 
-	bshr := g.NewBus(bas.GetSize())
-	woshr := g.NewWire()
-	NewShiftRight(bas, wci, bshr, woshr)
-	g.NewAND(woshr, bdec.GetWire(1), wco)
-	NewEnabler(bshr, bdec.GetWire(1), bcs)
+module jandder (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
+	genvar j ;
+	for (j = 0; j < 8 ; j = j + 1) begin
+		jand nj(bas[j], bbs[j], bcs[j]) ;
+	end
+endmodule
 
-	add := NewADDer(bas, bbs, wci, g.NewBus(bas.GetSize()), g.NewWire())
-	g.NewAND(add.co, bdec.GetWire(0), wco)
-	NewEnabler(add.cs, bdec.GetWire(0), bcs)
 
-	NewZero(bcs, wz)
-*/
+module jorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
+	genvar j ;
+	for (j = 0; j < 8 ; j = j + 1) begin
+		jor oj(bas[j], bbs[j], bcs[j]) ;
+	end
+endmodule
+
+
+module jxorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs, output weqo, output walo) ;
+	// Build the XORer circuit
+	reg one = 1 ;
+	reg zero = 0 ;
+	wire [0:6] teqo, talo ;
+
+	genvar j ;
+	jcmp cmp0(bas[0], bbs[0], one, zero, bcs[0], teqo[0], talo[0]) ;
+	for (j = 1; j < 7 ; j = j + 1) begin
+		jcmp cmpj(bas[j], bbs[j], teqo[j-1], talo[j-1], bcs[j], teqo[j], talo[j]) ;
+	end
+	jcmp cmpn(bas[7], bbs[7], teqo[6], talo[6], bcs[7], weqo, walo) ;
+endmodule
+
+
+module jadder (input [7:0] bas, input [7:0] bbs, input wci, output [7:0] bcs, output wco) ;
+	wire [0:6] tc ;
+
+	genvar j ;
+	jadd add0(bas[0], bbs[0], wci, bcs[0], tc[0]) ;
+	for (j = 1; j < 7; j = j + 1) begin
+		jadd addj(bas[j], bbs[j], tc[j-1], bcs[j], tc[j]) ;
+	end
+	jadd addn(bas[7], bbs[7], tc[6], bcs[7], wco) ;
+endmodule
+
+
+module jzero (input [7:0] bis, output wz) ;
+	wire wi ;
+	jorN #(8) orn(bis, wi) ;
+	jnot n(wi, wz) ;
+endmodule
+
+
+module jadd(input wa, input wb, input wci, output wc, output wco) ;
+        wire wi, wcoa, wcob ;
+        jxor xor1(wa, wb, wi) ;
+        jxor xor2(wi, wci, wc) ;
+        jand and1(wci, wi, wcoa) ;
+        jand and2(wa, wb, wcob) ;
+        jor or1(wcoa, wcob, wco) ;
+endmodule
+
+
+module jcmp(input wa, input wb, input weqi, input wali, output wc, output weqo, output walo) ;
+        wire w23, w45 ;
+        jxor xor1(wa, wb, wc) ;
+        jnot not1(wc, w23) ;
+        jand and1(weqi, w23, weqo) ;
+        jandN #(3) and3({weqi, wa, wc}, w45) ;
+        jor or1(wali, w45, walo) ;
+endmodule
+

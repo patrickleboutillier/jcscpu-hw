@@ -1,7 +1,9 @@
+`timescale 1ns / 1ps
 
 
 module jnand(input wa, input wb, output wc) ;
-	nand x(wc, wa, wb) ;
+	// Use this style to allow for simulation delays. 
+	assign #1 wc = ~(wa & wb) ;
 endmodule
 
 
@@ -32,26 +34,6 @@ module jxor(input wa, input wb, output wc) ;
 	jnand nand1(wic, wb, wie) ;
 	jnand nand2(wa, wid, wif) ;
 	jnand nand3(wie, wif, wc) ;
-endmodule
-
-
-module jadd(input wa, input wb, input wci, output wc, output wco) ;
-	wire wi, wcoa, wcob ;
-	jxor xor1(wa, wb, wi) ;
-	jxor xor2(wi, wci, wc) ;
-	jand and1(wci, wi, wcoa) ;
-	jand and2(wa, wb, wcob) ;
-	jor or1(wcoa, wcob, wco) ;
-endmodule
-
-
-module jcmp(input wa, input wb, input weqi, input wali, output wc, output weqo, output walo) ;
-	wire w23, w45 ;
-	jxor xor1(wa, wb, wc) ;
-	jnot not1(wc, w23) ;
-	jand and1(weqi, w23, weqo) ;
-	jandN #(3) and3({weqi, wa, wc}, w45) ;
-	jor or1(wali, w45, walo) ;
 endmodule
 
 
@@ -120,3 +102,62 @@ func (this *ORe) AddWire(w *Wire) {
 	this.n++
 }
 */
+
+
+module jena(input wi, input we, inout wo) ;
+	wire out ;
+	jand a(wi, we, out) ;
+	assign wo = (we) ? out : 1'bz ;
+endmodule
+
+
+module jenabler(input [7:0] bis, input we, inout [7:0] bos) ;
+	genvar j ;
+	generate
+		for (j = 0; j < 8 ; j = j + 1) begin
+			wire out ;
+			jand a(bis[j], we, out) ;
+			assign bos[j] = (we) ? out : 1'bz ;
+		end
+	endgenerate
+endmodule
+
+
+module jdecoder #(parameter N=2, N2=4) (input [N-1:0] bis, output [N2-1:0] bos) ;
+    wire [1:0] wmap[N-1:0] ;
+
+	// Create our wire map
+    genvar j ;
+    generate
+        for (j = 0; j < N ; j = j + 1) begin
+			jnot notj(bis[j], wmap[j][0]) ;
+			assign wmap[j][1] = bis[j] ;
+        end
+    endgenerate
+
+    genvar k ;
+    generate
+        for (j = 0; j < N2 ; j = j + 1) begin
+			wire [N-1:0] wos ;
+        	for (k = 0; k < N ; k = k + 1) begin
+				assign wos[k] = wmap[k][j[k]] ;
+			end
+			jandN #(N) andNj(wos, bos[j]) ;
+        end
+    endgenerate
+endmodule
+
+
+module jbus1 (input [7:0] bis, input wbit1, output [7:0] bos) ;
+	wire wnbit1 ;
+	jnot n(wbit1, wnbit1) ;
+
+	genvar j ;
+	for (j = 0 ; j < 8 ; j = j + 1) begin
+		if (j > 0) begin
+			jand andj(bis[j], wnbit1, bos[j]) ;
+		end else begin
+			jor orj(bis[j], wbit1, bos[j]) ;
+		end
+	end
+endmodule
