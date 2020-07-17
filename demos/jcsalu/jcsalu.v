@@ -35,8 +35,6 @@ module jcsalu(
     // Aliases for push buttons
     wire CI, EQI, ALI ;
     assign CI = BTNL ;
-    assign ALI = BTNC ;
-    assign EQI = BTNR ;
     
     reg [2:0] ops = 0 ;
     wire [7:0] alu_out ;
