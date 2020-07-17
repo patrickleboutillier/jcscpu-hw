@@ -14,7 +14,7 @@ module jcsbus(
 	   DATA=0, R0=1, R1=2, R2=3, R3=4, TMP=5, BUS1=6, ACC=7, LAST=7 ;
     
     // Move to the next mode when nextmode is set.
-	  reg [3:0] mode = ADDR, nextmode = ADDR ;
+    reg [3:0] mode = ADDR, nextmode = ADDR ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -31,39 +31,52 @@ module jcsbus(
 		end 
     end
 
+	reg [3:0] enas, sets ;
+	wire ena_click, set_click ;
+	click enabtn(CLK, BTNL, ena_click) ;
+	click setbtn(CLK, BTNR, set_click) ;	
 
-    // Aliases for push buttons
-    wire ENA, SET ;
-    assign ENA = BTNL ;
-    assign SET = BTNR ;
-    
-    wire [7:0] bus ;
-    reg [15:0] mdec_out ;
-    jdecoder #(4, 16) mdec(mode, mdec_out) ;
-    
+	always @(posedge CLK) begin
+		if (ena_click) 
+			enas <= mode ;
+		if (set_click) ;
+			sets <= mode ;
+	end
+
+	
+	// The decoders for ena and set will send the signal to the right component
+	reg [15:0] ena_dec, set_dec ;
+	jdecoder #(4, 16) enadec(enas, ena_dec) ;
+	jdecoder #(4, 16) setdec(sets, set_dec) ;
+
+	wire [7:0] bus, acc_bus, tmp_bus, bus1_bus ;
+	
     // data
-    wire datae ;
-    jenabler dataout(SW[7:0], datae, bus) ;
-    jena dataena(ENA, mdec_out[0], datae) ;
+	jenabler dataout(SW[7:0], enadec[0], bus) ;
     
-    // r0
-    wire r0e, r0s ;
-    jregister r0(bus, r0s, r0e, bus) ;
-    jena r0ena(ENA, mdec_out[1], r0e) ;
-    jena r0set(SET, mdec_out[1], r0s) ;
+    // r0, r1, r2, r3
+	jregister r0(bus, setdec[1], enadec[1], bus) ;
+	jregister r1(bus, setdec[2], enadec[2], bus) ;
+	jregister r2(bus, setdec[3], enadec[3], bus) ;
+	jregister r3(bus, setdec[4], enadec[4], bus) ;
     
-    /*
-    reg [2:0] ops = 0 ;
-    wire [7:0] alu_out ;
+	// tmp
+	jregister tmp(bus, setdec[5], enadec[5], bus) ;
+	
+	// bus1
+	jbus1 ubus1(tmp_bus, enadec[6], bus1_out) ;	
+	
+	// alu
     wire alu_co, alu_alo, alu_eqo, alu_z ;
-    jALU ualu(SW[7:0], SW[15:8], CI, ops, alu_out, alu_co, alu_eqo, alu_alo, alu_z) ;
-    */
+	jALU ualu(bus, bus1_bus, 1'b0, SW[10:8], acc_bus, alu_co, alu_eqo, alu_alo, alu_z) ;
     
+	// acc
+	jregister acc(acc_bus, setdec[7], enadec[7], bus) ;
+	
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(*) begin
-        ops = mode ;
         // LED[15:12] = {alu_co, alu_alo, alu_eqo, alu_z} ;
         // LED[11] = 0 ;
         LED[10:8] = SW[10:8] ;
