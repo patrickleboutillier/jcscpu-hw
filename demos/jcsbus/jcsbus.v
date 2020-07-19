@@ -40,18 +40,18 @@ module jcsbus(
 	always @(posedge CLK) begin
 		if (ena_click) 
 			enas <= mode ;
-		if (set_deb)
-		    sets <= mode ;
-        else
-            sets <= 0 ;  
+		//if (set_deb)
+		//    sets <= mode ;
+        //else
+        //    sets <= 0 ;  
 	end
 
 	
 	// The decoders for ena and set will send the signal to the right component.
 	// Using a case-based decoder (instead of a jdecoder) helps the tool figure out what we are trying to do. 
 	wire [15:0] ena_dec, set_dec ;
-	decoder4x16 enadec(enas, ena_dec) ;
-	decoder4x16 setdec(sets, set_dec) ;
+	decoder4x16 enadec(enas, 1'b1, ena_dec) ;
+	decoder4x16 setdec(mode, set_deb, set_dec) ;
 
     wor [7:0] bus ;
 	wire [7:0] acc_bus, tmp_bus, bus1_bus ;
@@ -82,35 +82,52 @@ module jcsbus(
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(*) begin
+        LED[15] = 0 ;
+        LED[13:11] = 0 ;
+        LED[9:8] = 0 ;
         //LED[15:12] = {alu_co, alu_alo, alu_eqo, alu_z} ;
         //LED[11] = 0 ;
         //LED[10] = ena_dec[mode] ;
         //LED[9] = set_dec[mode] ;
-        LED[15:12] = enas ;
-        LED[11:8] = sets ;
-        LED[8] = 0 ;
+        //LED[15:12] = enas ;
+        //LED[11:8] = sets ;
+        //LED[8] = 0 ;
         LED[7:0] = bus ;
         case (mode)
             DATA: begin
                 word = "data" ;
+                LED[14] = ena_dec[DATA] ;
+                LED[10] = set_dec[DATA] ;
             end
             R0: begin
                 word = "  r0" ;
+                LED[14] = ena_dec[R0] ;
+                LED[10] = set_dec[R0] ;
             end
             R1: begin
                 word = "  r1" ;
+                LED[14] = ena_dec[R1] ;
+                LED[10] = set_dec[R1] ;
             end
             R2: begin
                 word = "  r2" ;
+                LED[14] = ena_dec[R2] ;
+                LED[10] = set_dec[R2] ;
             end
             R3: begin
                 word = "  r3" ;
+                LED[14] = ena_dec[R3] ;
+                LED[10] = set_dec[R3] ;
             end
             TMP: begin
                 word = " tmp" ;
+                LED[14] = ena_dec[TMP] ;
+                LED[10] = set_dec[TMP] ;
             end
             ACC: begin
                 word = " acc" ;
+                LED[10] = ena_dec[ACC] ;
+                LED[10] = set_dec[ACC] ;
             end
             default: begin
                 word = "    " ;
@@ -121,26 +138,6 @@ module jcsbus(
 endmodule
 
 
-module decoder4x16 (input [3:0] in, output reg [15:0] out) ;
- 
-always @ (in) begin
-    case (in)
-        4'h0 : out = 16'h0001;
-        4'h1 : out = 16'h0002;
-        4'h2 : out = 16'h0004;
-        4'h3 : out = 16'h0008;
-        4'h4 : out = 16'h0010;
-        4'h5 : out = 16'h0020;
-        4'h6 : out = 16'h0040;
-        4'h7 : out = 16'h0080;
-        4'h8 : out = 16'h0100;
-        4'h9 : out = 16'h0200;
-        4'hA : out = 16'h0400;
-        4'hB : out = 16'h0800;
-        4'hC : out = 16'h1000;
-        4'hD : out = 16'h2000;
-        4'hE : out = 16'h4000;
-        4'hF : out = 16'h8000;
-    endcase
-end
+module decoder4x16 (input [3:0] in, input en, output [15:0] out) ;
+    assign out = (en) ? (1 << in) : 16'b0 ;
 endmodule
