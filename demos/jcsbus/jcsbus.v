@@ -33,17 +33,13 @@ module jcsbus(
     
     assign SET = BTNR ;
     
-	reg [3:0] enas, sets ;
+	reg [3:0] enas ;
 	wire ena_click, set_deb ;
 	click enabtn(CLK, BTNL, ena_click) ;
 	debounce setbtn(CLK, BTNR, set_deb) ;	
 	always @(posedge CLK) begin
 		if (ena_click) 
 			enas <= mode ;
-		//if (set_deb)
-		//    sets <= mode ;
-        //else
-        //    sets <= 0 ;  
 	end
 
 	
@@ -85,13 +81,6 @@ module jcsbus(
         LED[15] = 0 ;
         LED[13:11] = 0 ;
         LED[9:8] = 0 ;
-        //LED[15:12] = {alu_co, alu_alo, alu_eqo, alu_z} ;
-        //LED[11] = 0 ;
-        //LED[10] = ena_dec[mode] ;
-        //LED[9] = set_dec[mode] ;
-        //LED[15:12] = enas ;
-        //LED[11:8] = sets ;
-        //LED[8] = 0 ;
         LED[7:0] = bus ;
         case (mode)
             DATA: begin
