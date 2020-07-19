@@ -111,16 +111,31 @@ module jena(input wi, input we, inout wo) ;
 endmodule
 
 
-module jenabler(input [7:0] bis, input we, inout [7:0] bos) ;
+module jenabler(input [7:0] bis, input we, output [7:0] bos) ;
 	genvar j ;
 	generate
 		for (j = 0; j < 8 ; j = j + 1) begin
-			wire out ;
-			jand a(bis[j], we, out) ;
-			assign bos[j] = (we) ? out : 1'bz ;
+			//wire out ;
+			jand a(bis[j], we, bos[j]) ;
+			//assign bos[j] = (we) ? out : 1'bz ;
 		end
 	endgenerate
 endmodule
+
+
+/*
+module jenablerio(input we, inout [7:0] bio) ;
+	genvar j ;
+	generate
+		for (j = 0; j < 8 ; j = j + 1) begin
+			wire in, out ;
+			assign in = 
+			jand a(bio[j], we, out) ;
+			assign bio[j] = (we) ? out : 1'bz ;
+		end
+	endgenerate
+endmodule
+*/
 
 
 module jdecoder #(parameter N=2, N2=4) (input [N-1:0] bis, output [N2-1:0] bos) ;
