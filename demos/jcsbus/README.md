@@ -16,7 +16,6 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * r2
 * r3
 * tmp
-* bus1
 * acc
 * mar
 * ram
@@ -24,7 +23,7 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 ## Push buttons (callout #7)
 * _BTNU_: The top button is used to move to the previous demo mode. 
 * _BTND_: The bottom button is used to move to the previous demo mode.
-* _BTNL_: When pressed, sets the "enable" (_ENA_) input to 1 for the selected component. Also used as the _BIT1_ button for the bus1 circuit.
+* _BTNL_: When pressed, sets the "enable" (_ENA_) input to 1 for the selected component.
 * _BTNR_: When pressed, sets the "set" (_SET_) input to 1 for the selected component.
 
 ## Switches (_SW15_ through _SW0_) (callout #5)
@@ -32,12 +31,11 @@ Switches are used to specify the input bits for the DATA mode, and to indicate t
 
 ## LEDs (_LD15_ through _LD0_) (callout #6)
 LEDs are used to indicate the output values for the various components.
-* _LD15_: "carry out" (_CO_) flag.
-* _LD14_: "equal out" (_EQO_) flag.
-* _LD13_: "a-larger out" (_ALO_) flag.
-* _LD12_: "zero" (_Z_) flag.
-* _lD11_: Always 0.
-* _LD[10:8]_: The operation mode of the ALU (binary values 000 through 110).
+* _LD15_: Always off.
+* _LD14_: Turns on if the current register's _ENA_ input is on.
+* _LD[13:11]_: Always off.
+* _LD10_: Turns on if the current register's _SET_ input is on.
+* _LD[9:8]_: Always off.
 * _LD[7:0]_: The value on the BUS when the _ENA_ button is pressed.
 
 # Modes
@@ -52,14 +50,14 @@ LEDs are used to indicate the output values for the various components.
 * e = _ENA_
 
 ### tmp
-"tmp" connects _SET_ to set wire of the specified TMP register.
+"tmp" connects _SET_ to set wire of the TMP register.
 * s = _SET_
-
-### bus1
-"bus1" uses the _ENA_ button to enable the BIT1 bit of the BUS1 circuit.
-* e = _ENA_
 
 ### acc
-"acc" connects _ENA_ and _SET_ to the enable and set wire of the specified register.
+"acc" connects _ENA_ and _SET_ to the enable and set wire of the ACC register.
 * s = _SET_
 * e = _ENA_
+
+### mar
+"mar" connects _SET_ to the set wire of the MAR register.
+* s = _SET_
