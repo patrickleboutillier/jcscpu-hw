@@ -11,7 +11,7 @@ module jcsbus(
     
 	parameter 
 	   FIRST=1, 
-	   DATA=1, R0=2, R1=3, R2=4, R3=5, TMP=6, ACC=7, LAST=7 ;
+	   DATA=1, R0=2, R1=3, R2=4, R3=5, TMP=6, ACC=7, MAR=8, RAM=9, LAST=9 ;
     
     // Move to the next mode when nextmode is set.
     reg [3:0] mode = DATA, nextmode = DATA ;
@@ -73,6 +73,9 @@ module jcsbus(
     
 	// acc
 	jregister acc(acc_bus, set_dec[ACC], ena_dec[ACC], bus) ;
+
+    // RAM
+    jRAM ram(bus, set_dec[MAR], bus, set_dec[RAM], ena_dec[RAM], bus) ;
 	
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
@@ -117,6 +120,16 @@ module jcsbus(
                 word = " acc" ;
                 LED[10] = ena_dec[ACC] ;
                 LED[10] = set_dec[ACC] ;
+            end
+            MAR: begin
+                word = " mar" ;
+                LED[10] = ena_dec[MAR] ;
+                LED[10] = set_dec[MAR] ;
+            end
+            RAM: begin
+                word = " ram" ;
+                LED[10] = ena_dec[RAM] ;
+                LED[10] = set_dec[RAM] ;
             end
             default: begin
                 word = "    " ;
