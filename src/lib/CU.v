@@ -10,7 +10,8 @@ module jCU (
 	output r0_s, r0_e, r1_s, r1_e, r2_s, r2_e, r3_s, r3_e, 
     output ram_mar_s, ram_s, ram_e,
 	output iar_s, iar_e, ir_s,
-	output halt
+	output halt,
+	output io_s, io_e, io_io, io_da
 	) ;
 
 
@@ -189,6 +190,22 @@ module jCU (
 
 	// HALT, 01100001
 	jandN #(3) hltand1({inst_bus[6], STP_bus[5], clbinst[1]}, halt) ;
+
+
+	// IO INSTRUCTIONS
+	wire io1 ;
+	jandN #(3) ioand1({STP_bus[3], inst_bus[7], ir_bus[4]}, io1) ;
+	assign regb_ena_wor = io1 ;
+
+	wire ion4, io2 ;
+	jnot ionot1(ir_bus[4], ion4) ;
+	jandN #(3) ioand2({STP_bus[4], inst_bus[7], ion4}, io2) ;
+	assign regb_set_wor = io2 ;
+
+	jand ios(CLK_clks, io1, io_s) ;
+	jand ioe(CLK_clke, io2, io_e) ;
+	assign io_io = ir_bus[4] ;
+	assign io_da = ir_bus[5] ;
 
 
 /*

@@ -47,7 +47,16 @@ jregister iar(bus, iar_s, iar_e, bus) ;
 jregister ir(bus, ir_s, 1'b1, ir_bus) ;
 
 wire halt ;
+wire io_s, io_e, io_da, io_io ;
 
+// Provide io_dev and io_data for caller.
+reg [7:0] io_dev, io_data ;
+always @(io_s or io_e or io_da or io_io) begin
+    if (io_s && io_da && io_io)
+        io_dev = bus ;
+    if (io_s && !io_da && io_io)
+        io_data = bus ;
+end
 
 // For test suite
 // assign out[0:2] = alu_op ;
