@@ -11,15 +11,22 @@ for f in tb/tv/*.tv ; do
 	{
 		echo '`timescale 1ns / 1ps'
 		echo 
+		echo 
 		echo "module test() ;"
 		echo
-		echo ' reg sclk, reset ;'
-		echo ' `define VERBOSE '$VERBOSE
-		cat $f | grep ^// | sed 's/^\/\///'
-		echo ' `define TVFILE "'$f'"'
-		echo ' `define DUMPFILE "'tb/out/${g}.vcd'"'
+		echo '    `define VERBOSE '$VERBOSE
+		echo '    `define TVFILE "'$f'"'
+		echo '    `define DUMPFILE "'tb/out/${g}.vcd'"'
 		NBLINES=$(grep ^[01xz] $f | wc -l)
-		echo ' `define NBLINES '$NBLINES
+		echo '    `define NBLINES '$NBLINES
+		echo
+		echo '    reg sclk, reset ;'
+		echo
+		cat $f | grep ^// | sed 's/^\/\//   /'
+		echo
+    	echo '    reg [0:`INLEN-1] in ;'
+	    echo '    wire [0:`OUTLEN-1] out ;'
+		echo
 		cat tb/tools/template.v
 
 		if [ -f ${f}_mod ] ; then
