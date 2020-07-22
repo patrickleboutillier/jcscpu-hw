@@ -175,6 +175,22 @@ module jCU (
 	assign iar_set_wor = d3 ;
 
 
+	// CLF INSTRUCTIONS
+	wire [3:0] clbreg ;
+	assign clbreg = { ir_bus[4:7] } ;
+	wire [15:0] clbinst ;
+	jdecoder #(4, 16) clfdec(clbreg, clbinst) ;
+
+	// CLF, 01100000
+	wire cl1 ;
+	jandN #(3) cland1({inst_bus[6], STP_bus[3], clbinst[0]}, cl1) ;
+	assign bus1_bit1_wor = cl1 ;
+	assign flags_set_wor = cl1 ;
+
+	// HALT, 01100001
+	jandN #(3) hltand1({inst_bus[6], STP_bus[5], clbinst[1]}, halt) ;
+
+
 /*
 
 func JUMPInstructions(BB *Breadboard) {
@@ -222,27 +238,6 @@ func JUMPInstructions(BB *Breadboard) {
 }
 
 func CLFInstructions(BB *Breadboard) {
-	// Use the last 4 bits of the CLF instruction for control instructions.
-	breg := g.WrapBusV(BB.GetBus("IR.bus").GetWire(4), BB.GetBus("IR.bus").GetWire(5), BB.GetBus("IR.bus").GetWire(6), BB.GetBus("IR.bus").GetWire(7))
-	binst := g.NewBus(16)
-	p.NewDecoder(breg, binst)
-
-	// CLF, 01100000
-	cl1 := g.NewWire()
-	g.NewANDn(g.WrapBusV(BB.GetBus("INST.bus").GetWire(6), BB.GetBus("STP.bus").GetWire(3), binst.GetWire(0)), cl1)
-	BB.GetORe("BUS1.bit1.eor").AddWire(cl1)
-	BB.GetORe("FLAGS.set.eor").AddWire(cl1)
-
-	// HALT, 01100001
-	hlt1 := g.NewWire()
-	g.NewANDn(g.WrapBusV(BB.GetBus("INST.bus").GetWire(6), BB.GetBus("STP.bus").GetWire(5), binst.GetWire(1)), hlt1)
-	hlt1.AddPrehook(func(v bool) {
-		if v {
-			// Make sure we complete the instruction before halting.
-			BB.CLK.StopIn(1)
-		}
-	})
-
 	// DEBUG3,2,1,0, 011010[00,01,10,11]
 	for j := 0; j < 4; j++ {
 		dbg := g.NewWire()
