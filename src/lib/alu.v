@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 
 
 module jALU (input [7:0] bas, input [7:0] bbs, input wci, input [2:0] bops, 
@@ -11,35 +12,31 @@ module jALU (input [7:0] bas, input [7:0] bbs, input wci, input [2:0] bops,
 	wire [7:0] bxor, bor, band, bnot, bshl, bshr ;
 
 	jxorer xorer(bas, bbs, bxor, weqo, walo) ;
-	//jena xore(1'b0, bdec[6], wco) ;
 	jenabler enaxor(bxor, bdec[6], bcs) ;
 
 	jorer orer(bas, bbs, bor) ;
-	//jena ore(1'b0, bdec[5], wco) ;
 	jenabler enaor(bor, bdec[5], bcs) ;
 
 	jandder andder(bas, bbs, band) ;
-	//jena ande(1'b0, bdec[4], wco) ;
 	jenabler enaand(band, bdec[4], bcs) ;
 
 	jnotter n(bas, bnot) ;
-	//jena note(1'b0, bdec[3], wco) ;
 	jenabler enanot(bnot, bdec[3], bcs) ;
 
 	wire woshl ;
 	jshiftl shitfl(bas, wci, bshl, woshl) ;
-	//jena sle(woshl, bdec[2], wco) ;
+	jand sle(woshl, bdec[2], wco) ;
 	jenabler enashl(bshl, bdec[2], bcs) ;
 
 	wire woshr ;
 	jshiftr shiftr(bas, wci, bshr, woshr) ;
-	//jena sre(woshr, bdec[1], wco) ;
+	jand sre(woshr, bdec[1], wco) ;
 	jenabler enashr(bshr, bdec[1], bcs) ;
 
 	wire aco ;
 	wire [7:0] acs ;
 	jadder adder(bas, bbs, wci, acs, aco) ;
-	//jena adde(aco, bdec[0], wco) ;
+	jand adde(aco, bdec[0], wco) ;
 	jenabler enaadd(acs, bdec[0], bcs) ;
 
 	jzero z(bcs, wz) ;
