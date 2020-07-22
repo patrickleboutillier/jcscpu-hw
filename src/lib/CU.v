@@ -9,7 +9,8 @@ module jCU (
 	output alu_ena_ci, flags_s, tmp_s, bus1_bit1, acc_s, acc_e,
 	output r0_s, r0_e, r1_s, r1_e, r2_s, r2_e, r3_s, r3_e, 
     output ram_mar_s, ram_s, ram_e,
-	output iar_s, iar_e, ir_s
+	output iar_s, iar_e, ir_s,
+	output halt
 	) ;
 
 
@@ -174,12 +175,7 @@ module jCU (
 	assign iar_set_wor = d3 ;
 
 
-	// initial $monitor("ir_bus=%b, inst_bus=%b, rega_e=%b, regb_e=%b, aa2=%b, l1=%b, s1=%b", ir_bus, inst_bus, rega_e, regb_e, aa2, l1, s1) ;
 /*
-
-func LDSTInstructions(BB *Breadboard) {
-}
-
 
 func JUMPInstructions(BB *Breadboard) {
 	// JUMPR

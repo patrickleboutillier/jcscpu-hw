@@ -46,6 +46,9 @@ wire [7:0] ir_bus ;
 jregister iar(bus, iar_s, iar_e, bus) ;
 jregister ir(bus, ir_s, 1'b1, ir_bus) ;
 
+wire halt ;
+
+
 // For test suite
 // assign out[0:2] = alu_op ;
 // assign out[3] = alu_ci ;
