@@ -3,7 +3,7 @@
 
 module jCU (
 	input CLK_clk, input CLK_clkd, input CLK_clke, input CLK_clks, input [0:5] STP_bus,
-	input flags_co, flags_eqo, flags_alo, flags_z, 
+	input [3:0] flags_bus, 
 	input [0:7] ir_bus,
 	output [0:2] alu_op,
 	output alu_ena_ci, flags_s, tmp_s, bus1_bit1, acc_s, acc_e,
@@ -208,52 +208,51 @@ module jCU (
 	assign io_da = ir_bus[5] ;
 
 
-/*
-
-func JUMPInstructions(BB *Breadboard) {
+	// JUMP INSTRUCTIONS
 	// JUMPR
-	jr1 := g.NewWire()
-	g.NewAND(BB.GetBus("STP.bus").GetWire(3), BB.GetBus("INST.bus").GetWire(3), jr1)
-	BB.GetORe("REGB.ena.eor").AddWire(jr1)
-	BB.GetORe("IAR.set.eor").AddWire(jr1)
+	wire jr1 ;
+	jand jrand(STP_bus[3], inst_bus[3], jr1) ;
+	assign regb_ena_wor = jr1 ;
+	assign iar_set_wor = jr1 ;
 
 	// JUMP
-	j1 := g.NewWire()
-	g.NewAND(BB.GetBus("STP.bus").GetWire(3), BB.GetBus("INST.bus").GetWire(4), j1)
-	BB.GetORe("IAR.ena.eor").AddWire(j1)
-	BB.GetORe("RAM.MAR.set.eor").AddWire(j1)
+	wire j1 ;
+	jand jand1(STP_bus[3], inst_bus[4], j1) ;
+	assign iar_ena_wor = j1 ;
+	assign ram_mar_set_wor = j1 ;
 
-	j2 := g.NewWire()
-	g.NewAND(BB.GetBus("STP.bus").GetWire(4), BB.GetBus("INST.bus").GetWire(4), j2)
-	BB.GetORe("RAM.ena.eor").AddWire(j2)
-	BB.GetORe("IAR.set.eor").AddWire(j2)
+	wire j2 ;
+	jand jand2(STP_bus[4], inst_bus[4], j2) ;
+	assign ram_ena_wor = j2 ;
+	assign iar_set_wor = j2 ;
 
 	// JUMPIF
-	ji1 := g.NewWire()
-	g.NewAND(BB.GetBus("STP.bus").GetWire(3), BB.GetBus("INST.bus").GetWire(5), ji1)
-	BB.GetORe("BUS1.bit1.eor").AddWire(ji1)
-	BB.GetORe("IAR.ena.eor").AddWire(ji1)
-	BB.GetORe("RAM.MAR.set.eor").AddWire(ji1)
-	BB.GetORe("ACC.set.eor").AddWire(ji1)
+	wire ji1 ;
+	jand jiand1(STP_bus[3], inst_bus[5], ji1) ;
+	assign bus1_bit1_wor = ji1 ;
+	assign iar_ena_wor = ji1 ;
+	assign ram_mar_set_wor = ji1 ;
+	assign acc_set_wor = ji1 ;
 
-	ji2 := g.NewWire()
-	g.NewAND(BB.GetBus("STP.bus").GetWire(4), BB.GetBus("INST.bus").GetWire(5), ji2)
-	BB.GetORe("ACC.ena.eor").AddWire(ji2)
-	BB.GetORe("IAR.set.eor").AddWire(ji2)
+	wire ji2 ;
+	jand jiand2(STP_bus[4], inst_bus[5], ji2) ;
+	assign acc_ena_wor = ji2 ;
+	assign iar_set_wor = ji2 ;
 
-	ji3 := g.NewWire()
-	flago := g.NewWire()
-	g.NewANDn(g.WrapBusV(BB.GetBus("STP.bus").GetWire(5), BB.GetBus("INST.bus").GetWire(5), flago), ji3)
-	BB.GetORe("RAM.ena.eor").AddWire(ji3)
-	BB.GetORe("IAR.set.eor").AddWire(ji3)
+	wire ji3, jflago ;
+	jandN #(3) jiand3({STP_bus[5], inst_bus[5], jflago}, ji3) ;
+	assign ram_ena_wor = ji3 ;
+	assign iar_set_wor = ji3 ;
 
-	fbus := g.NewBus(4)
-	for j := 0; j < 4; j++ {
-		g.NewAND(BB.GetBus("FLAGS.bus").GetWire(j), BB.GetBus("IR.bus").GetWire(j+4), fbus.GetWire(j))
-	}
-	g.NewORn(fbus, flago)
-}
+	wire [0:3] jfbus ;
+	jand jfand1(flags_bus[3], ir_bus[4], jfbus[0]) ;
+	jand jfand2(flags_bus[2], ir_bus[5], jfbus[1]) ;
+	jand jfand3(flags_bus[1], ir_bus[6], jfbus[2]) ;
+	jand jfand4(flags_bus[0], ir_bus[7], jfbus[3]) ;
+	jorN #(4) jfor1(jfbus, jflago) ;
+endmodule
 
+/*
 func CLFInstructions(BB *Breadboard) {
 	// DEBUG3,2,1,0, 011010[00,01,10,11]
 	for j := 0; j < 4; j++ {
@@ -276,25 +275,4 @@ func CLFInstructions(BB *Breadboard) {
 		}
 	})
 }
-
-func IOInstructions(BB *Breadboard) {
-	// IO
-	io1 := g.NewWire()
-	g.NewANDn(g.WrapBusV(BB.GetBus("STP.bus").GetWire(3), BB.GetBus("INST.bus").GetWire(7), BB.GetBus("IR.bus").GetWire(4)), io1)
-	BB.GetORe("REGB.ena.eor").AddWire(io1)
-
-	ion4 := g.NewWire()
-	g.NewNOT(BB.GetBus("IR.bus").GetWire(4), ion4)
-	io2 := g.NewWire()
-	g.NewANDn(g.WrapBusV(BB.GetBus("STP.bus").GetWire(4), BB.GetBus("INST.bus").GetWire(7), ion4), io2)
-	BB.GetORe("REGB.set.eor").AddWire(io2)
-
-	g.NewAND(BB.GetWire("CLK.clks"), io1, BB.GetWire("IO.clks"))
-	g.NewAND(BB.GetWire("CLK.clke"), io2, BB.GetWire("IO.clke"))
-	g.NewCONN(BB.GetBus("IR.bus").GetWire(4), BB.GetWire("IO.io"))
-	g.NewCONN(BB.GetBus("IR.bus").GetWire(5), BB.GetWire("IO.da"))
-|
 */
-
-
-endmodule

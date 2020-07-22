@@ -26,9 +26,9 @@ wire [7:0] alu_bus ;
 wire alu_ci, alu_co, alu_eqo, alu_alo, alu_z ;
 jALU alu(bus, bus1_bus, alu_ci, alu_op, alu_bus, alu_co, alu_eqo, alu_alo, alu_z) ;
 
-wire flags_s, flags_co, flags_eqo, flags_alo, flags_z ;
+wire flags_s ;
 wire [7:0] flags_in, flags_bus ;
- assign flags_in = {alu_co, alu_alo, alu_eqo, alu_z, 4'b0000} ;
+assign flags_in = {alu_co, alu_alo, alu_eqo, alu_z, 4'b0000} ;
 jregister flags(flags_in, flags_s, 1'b1, flags_bus) ;
 
 wire acc_s, acc_e ;
@@ -51,11 +51,25 @@ wire io_s, io_e, io_da, io_io ;
 
 // Provide io_dev and io_data for caller.
 reg [7:0] io_dev, io_data ;
+reg [7:0] rng = 0 ;
+assign bus = rng ;
 always @(io_s or io_e or io_da or io_io) begin
     if (io_s && io_da && io_io)
         io_dev = bus ;
     if (io_s && !io_da && io_io)
         io_data = bus ;
+    if (!io_s && !io_da && io_io)
+		// Clear reg where s is done
+        io_data = 0 ;
+
+    if (io_e && !io_da && !io_io) begin
+		if (io_dev == 1) 
+			rng = $urandom_range(255, 0) ;
+	end
+    if (!io_e && !io_da && !io_io) begin
+		if (io_dev == 1) 
+			rng = 0 ;
+	end
 end
 
 // For test suite

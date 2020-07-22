@@ -56,7 +56,7 @@ cat <<'V' >> /tmp/v
 
     jCU x(
       .CLK_clk(CLK_clk), .CLK_clkd(CLK_clkd), .CLK_clke(CLK_clke), .CLK_clks(CLK_clks), .STP_bus(STP_bus),
-      .flags_co(flags_co), .flags_eqo(flags_eqo), .flags_alo(flags_alo), .flags_z(flags_z),
+      .flags_bus(flags_bus[7:4]),
       .ir_bus(ir_bus),
       .alu_op(alu_op),
       .alu_ena_ci(alu_ena_ci), .flags_s(flags_s), .tmp_s(tmp_s), .bus1_bit1(bus1_bit1), .acc_s(acc_s), .acc_e(acc_e),
@@ -76,12 +76,13 @@ cat <<'V' >> /tmp/v
 	// Poor man's TTY
 	always @(io_data) begin
 		if (io_dev == 0)
-			$display("%c", io_data) ;
+			$write("%c", io_data) ;
 	end
 
-	//initial $monitor("bus=%b", bus) ;
-	//initial $monitor("io_s=%b, io_e=%b, io_da=%b, io_io=%b", io_s, io_e, io_da, io_io) ;
+	// initial $monitor("bus=%b", bus) ;
+	// initial $monitor("flags_s=%b, flags_in=%b, flags_bus=%b", flags_s, flags_in, flags_bus) ;
+	// initial $monitor("io_s=%b, io_e=%b, io_da=%b, io_io=%b", io_s, io_e, io_da, io_io) ;
 endmodule
 V
 
-iverilog -Wall -o /tmp/jcscpu.vvp src/lib/*.v /tmp/v && vvp /tmp/jcscpu.vvp
+iverilog -Wall -o /tmp/jcscpu.vvp src/lib/*.v /tmp/v && vvp -i -n /tmp/jcscpu.vvp
