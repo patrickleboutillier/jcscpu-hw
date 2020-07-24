@@ -13,7 +13,7 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * mem
 * reg
 * clk
-* stp
+* step
 
 ## Push buttons (callout #7)
 * _BTNU_: The top button is used to move to the previous demo mode.
@@ -26,8 +26,28 @@ Switches are used to control the input bits to the various components. Only _SW[
 
 ## LEDs (_LD15_ through _LD0_) (callout #6)
 LEDs are used to indicate the output values for the various components.
-* _LD[15:14]_: clee and clks signals of the clk.
-* _LD[13:8]_: Steps of the stepper.
-* _LD[7:0]_: Output bits for the various components.
 
 # Modes
+
+### mem(i, s) => (o)
+"mem" connects the inputs and the output with an MEM circuit (page 26).
+* i = _SW0_
+* s = _SET_
+* o = _LD0_
+
+### reg(I, s, e) => (O)
+* i = _SW[7:0]_
+* s = _SET_
+* e = _ENA_
+* o = _LD[7:0]_
+
+### clk => (clk, clkd, clke, clks)
+"clk" provide the clock for the system. It is seeded with the FPGA system clockconnects the inputs and the outputs with a ADD circuit (page 80).
+* clk = _LD3_
+* clkd = _LD2_
+* clke = _LD1_
+* clks = _LD0_
+
+### step => (O)
+"step" connects the inputs and the outputs with a CMP circuit (page 83).
+* O = _LD[15:10]_
