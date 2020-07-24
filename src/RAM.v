@@ -1,6 +1,7 @@
+`timescale 1ns / 1ps
 
 
-module jRAM (input [7:0] bas, input wsa, inout [7:0] bio, input ws, input we) ;
+module jRAM (input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, output wor [7:0] bos) ;
 	wire [7:0] busd ;
 	reg on = 1 ;
 	jregister MAR(bas, wsa, on, busd) ;
@@ -20,19 +21,23 @@ module jRAM (input [7:0] bas, input wsa, inout [7:0] bio, input ws, input we) ;
 				jand and2(wxo, ws, wso) ;
 				jand and3(wxo, we, weo) ;
 
-				jregister regxy(bio, wso, weo, bio) ;
+				jregister regxy(bis, wso, weo, bos) ;
 			end
 		end
 	endgenerate
+endmodule
 
-    /*
-	reg [`ARCH_BITS-1:0] RAM[0:(1<<`ARCH_BITS)-1] ;
-	assign bio = (we) ? RAM[busd] : {`ARCH_BITS{1'bz}} ;
+
+module jRAMBlock (input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, output wor [7:0] bos) ;
+	wire [7:0] busd ;
+	jregister MAR(bas, wsa, 1'b1, busd) ;
+
+	reg [7:0] RAM[0:255] ;
+	assign bos = (we) ? RAM[busd] : 0 ;
 	always @(ws) begin
 		if (ws)
-			RAM[busd] = bio ;
+			RAM[busd] = bis ;
 	end
-	*/
 endmodule
 
 

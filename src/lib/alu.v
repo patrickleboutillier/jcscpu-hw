@@ -1,7 +1,8 @@
+`timescale 1ns / 1ps
 
 
 module jALU (input [7:0] bas, input [7:0] bbs, input wci, input [2:0] bops, 
-	output [7:0] bcs, output wco, output weqo, output walo, output wz) ;
+	output wor [7:0] bcs, output wor wco, output weqo, output walo, output wz) ;
 	// Build the ALU circuit
 	wire [7:0] bdec ;
 	jdecoder #(3, 8) dec(bops, bdec) ;
@@ -11,35 +12,31 @@ module jALU (input [7:0] bas, input [7:0] bbs, input wci, input [2:0] bops,
 	wire [7:0] bxor, bor, band, bnot, bshl, bshr ;
 
 	jxorer xorer(bas, bbs, bxor, weqo, walo) ;
-	jena xore(1'b0, bdec[6], wco) ;
 	jenabler enaxor(bxor, bdec[6], bcs) ;
 
 	jorer orer(bas, bbs, bor) ;
-	jena ore(1'b0, bdec[5], wco) ;
 	jenabler enaor(bor, bdec[5], bcs) ;
 
 	jandder andder(bas, bbs, band) ;
-	jena ande(1'b0, bdec[4], wco) ;
 	jenabler enaand(band, bdec[4], bcs) ;
 
 	jnotter n(bas, bnot) ;
-	jena note(1'b0, bdec[3], wco) ;
 	jenabler enanot(bnot, bdec[3], bcs) ;
 
 	wire woshl ;
 	jshiftl shitfl(bas, wci, bshl, woshl) ;
-	jena sle(woshl, bdec[2], wco) ;
+	jand sle(woshl, bdec[2], wco) ;
 	jenabler enashl(bshl, bdec[2], bcs) ;
 
 	wire woshr ;
 	jshiftr shiftr(bas, wci, bshr, woshr) ;
-	jena sre(woshr, bdec[1], wco) ;
+	jand sre(woshr, bdec[1], wco) ;
 	jenabler enashr(bshr, bdec[1], bcs) ;
 
 	wire aco ;
 	wire [7:0] acs ;
 	jadder adder(bas, bbs, wci, acs, aco) ;
-	jena adde(aco, bdec[0], wco) ;
+	jand adde(aco, bdec[0], wco) ;
 	jenabler enaadd(acs, bdec[0], bcs) ;
 
 	jzero z(bcs, wz) ;
@@ -68,7 +65,7 @@ module jshiftl (input [0:7] bis, input wci, output [0:7] bos, output wco) ;
 endmodule
 
 
-module jnotter (input [7:0] bis, output [7:0] bos) ;
+module jnotter (input [0:7] bis, output [0:7] bos) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jnot nj(bis[j], bos[j]) ;
@@ -76,7 +73,7 @@ module jnotter (input [7:0] bis, output [7:0] bos) ;
 endmodule
 
 
-module jandder (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
+module jandder (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jand nj(bas[j], bbs[j], bcs[j]) ;
@@ -84,7 +81,7 @@ module jandder (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
 endmodule
 
 
-module jorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
+module jorer (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jor oj(bas[j], bbs[j], bcs[j]) ;
@@ -92,7 +89,7 @@ module jorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
 endmodule
 
 
-module jxorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs, output weqo, output walo) ;
+module jxorer (input [0:7] bas, input [0:7] bbs, output [0:7] bcs, output weqo, output walo) ;
 	// Build the XORer circuit
 	reg one = 1 ;
 	reg zero = 0 ;
@@ -119,7 +116,7 @@ module jadder (input [7:0] bas, input [7:0] bbs, input wci, output [7:0] bcs, ou
 endmodule
 
 
-module jzero (input [7:0] bis, output wz) ;
+module jzero (input [0:7] bis, output wz) ;
 	wire wi ;
 	jorN #(8) orn(bis, wi) ;
 	jnot n(wi, wz) ;

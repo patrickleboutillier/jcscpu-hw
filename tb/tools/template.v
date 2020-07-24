@@ -1,7 +1,4 @@
 
-	reg [0:`INLEN-1] in ;
-	wire [0:`OUTLEN-1] out ;
-
 	reg [31:0] tv, errors ; // bookkeeping variables
 	reg [0:`OUTLEN+`INLEN-1] tvs[0:`NBLINES-1] ; // array of testvectors
 
