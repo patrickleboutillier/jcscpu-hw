@@ -72,8 +72,10 @@ cat <<'V' >> /tmp/v
 
 	// Poor man's TTY. 
 	always @(io_data) begin
-		if (io_dev == 0)
+		if (io_dev == 0 && io_data != 0)
 			$write("%c", io_data) ;
+		if (io_dev == 1 && io_data != 0)
+			$write("%b", io_data) ;
 	end
 
 	// initial $monitor("bus=%b", bus) ;

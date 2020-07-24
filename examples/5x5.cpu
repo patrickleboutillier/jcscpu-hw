@@ -20,8 +20,8 @@
 00010110 # line  19, pos  19 -       00010110 (22)
 01000000 # line  20, pos  20 - JMP   00000111 (7)
 00000111 # line  21, pos  21 -       00000111 (7)
-00100011 # line  22, pos  22 - DATA  R3, 01100100 (100)
-01100100 # line  23, pos  23 -       01100100 (100)
-00011110 # line  24, pos  24 - ST    R3, R2
-01101000 # DEBUG, R2 should contain 25, 00011001
+00100000 # DATA  R0, 00000001 (1)
+00000001 # ...   1
+01111100 # OUTA  R0
+01111010 # OUTD  R2
 01100001 # line  25, pos  25 - HALT  (automatically inserted by jscasm)
