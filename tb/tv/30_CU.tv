@@ -8,7 +8,7 @@
 
 // jCU x(
 //   .CLK_clk(CLK_clk), .CLK_clkd(CLK_clkd), .CLK_clke(CLK_clke), .CLK_clks(CLK_clks), .STP_bus(STP_bus),
-//   .flags_co(flags_co), .flags_eqo(flags_eqo), .flags_alo(flags_alo), .flags_z(flags_z),
+//   .flags_bus(flags_bus[7:4]),
 //   .ir_bus(ir_bus), 
 //   .alu_op(alu_op),
 //   .alu_ena_ci(alu_ena_ci), .flags_s(flags_s), .tmp_s(tmp_s), .bus1_bit1(bus1_bit1), .acc_s(acc_s), .acc_e(acc_e),

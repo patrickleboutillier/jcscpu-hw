@@ -12,7 +12,7 @@ if [ ! -f "$FILE" ] ; then
 	exit 1
 fi
 
-cat $FILE | sed 's/#/\/\//' > /tmp/mem
+cat $FILE | grep -P '^[^\s]' | sed 's/#/\/\//' > /tmp/mem
 size=$(cat /tmp/mem | wc -l)
 for (( i=$size ; i < 256 ; i++ )) ; do
 	echo '01100001 // HALT' >> /tmp/mem
@@ -30,9 +30,7 @@ module jcscpu() ;
 		sclk = 1 ;
 		#50 ;
 		sclk = 0 ;
-		#200 ;
-		sclk = 1 ;
-		#150 ; // 400ns period
+		#50 ;
 	end
 V
 
@@ -68,21 +66,20 @@ cat <<'V' >> /tmp/v
 
 	always @(*) begin
 		if (halt) begin
-			$display("System halted!") ;
 			$finish ;
 		end
 	end
 
-	// Poor man's TTY
+	// Poor man's TTY. 
 	always @(io_data) begin
 		if (io_dev == 0)
 			$write("%c", io_data) ;
 	end
 
 	// initial $monitor("bus=%b", bus) ;
-	// initial $monitor("flags_s=%b, flags_in=%b, flags_bus=%b", flags_s, flags_in, flags_bus) ;
+	// initial $monitor("flags_s=%b, flags_bus=%b, %b%b%b%b bus=%b, bus1_bus=%b", flags_s, flags_bus, alu_co, alu_alo, alu_eqo, alu_z, bus, bus1_bus) ;
 	// initial $monitor("io_s=%b, io_e=%b, io_da=%b, io_io=%b", io_s, io_e, io_da, io_io) ;
 endmodule
 V
 
-iverilog -Wall -o /tmp/jcscpu.vvp src/lib/*.v /tmp/v && vvp -i -n /tmp/jcscpu.vvp
+iverilog -Wall -o /tmp/jcscpu.vvp src/lib/*.v /tmp/v && vvp -i -n /tmp/jcscpu.vvp 

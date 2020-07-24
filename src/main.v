@@ -72,6 +72,7 @@ always @(io_s or io_e or io_da or io_io) begin
 	end
 end
 
+
 // For test suite
 // assign out[0:2] = alu_op ;
 // assign out[3] = alu_ci ;

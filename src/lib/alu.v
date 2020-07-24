@@ -65,7 +65,7 @@ module jshiftl (input [0:7] bis, input wci, output [0:7] bos, output wco) ;
 endmodule
 
 
-module jnotter (input [7:0] bis, output [7:0] bos) ;
+module jnotter (input [0:7] bis, output [0:7] bos) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jnot nj(bis[j], bos[j]) ;
@@ -73,7 +73,7 @@ module jnotter (input [7:0] bis, output [7:0] bos) ;
 endmodule
 
 
-module jandder (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
+module jandder (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jand nj(bas[j], bbs[j], bcs[j]) ;
@@ -81,7 +81,7 @@ module jandder (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
 endmodule
 
 
-module jorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
+module jorer (input [0:7] bas, input [0:7] bbs, output [0:7] bcs) ;
 	genvar j ;
 	for (j = 0; j < 8 ; j = j + 1) begin
 		jor oj(bas[j], bbs[j], bcs[j]) ;
@@ -89,7 +89,7 @@ module jorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs) ;
 endmodule
 
 
-module jxorer (input [7:0] bas, input [7:0] bbs, output [7:0] bcs, output weqo, output walo) ;
+module jxorer (input [0:7] bas, input [0:7] bbs, output [0:7] bcs, output weqo, output walo) ;
 	// Build the XORer circuit
 	reg one = 1 ;
 	reg zero = 0 ;
@@ -116,7 +116,7 @@ module jadder (input [7:0] bas, input [7:0] bbs, input wci, output [7:0] bcs, ou
 endmodule
 
 
-module jzero (input [7:0] bis, output wz) ;
+module jzero (input [0:7] bis, output wz) ;
 	wire wi ;
 	jorN #(8) orn(bis, wi) ;
 	jnot n(wi, wz) ;
