@@ -11,11 +11,11 @@ module jcsbasic(
         
 	parameter 
 	   FIRST=0, 
-	   BUF=0, NOT=1, NAND=2, AND=3, OR=4, XOR=5, DEC3=6, ENABLE=7, BUS1=8, LAST=8 ;  
+	   NAND=0, NOT=1, AND=2, OR=3, XOR=4, DEC3=5, ENABLE=6, BUS1=7, LAST=7 ;  
    
         
     // Move to the next mode when nextmode is set.
-	reg [3:0] mode = BUF, nextmode = BUF ;
+	reg [3:0] mode = NAND, nextmode = NAND ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -81,20 +81,15 @@ module jcsbasic(
     always @(*) begin
         LED[15:8] = 0 ;
         case (mode)
-            BUF: begin
-                word = " buf" ;
+            NAND: begin
+                 word = "nand" ;
                 LED[7:1] = 0 ;
-                LED[0] = buf_out ;
+                LED[0] = nand_out ;
             end
             NOT: begin
                 word = " not" ;
                 LED[7:1] = 0 ;
                 LED[0] = not_out ;
-            end
-            NAND: begin
-                 word = "nand" ;
-                LED[7:1] = 0 ;
-                LED[0] = nand_out ;
             end
             AND: begin
                 word = " and" ;
