@@ -2,7 +2,6 @@
 
 
 module jnand(input wa, input wb, output wc) ;
-	// Use this style to allow for simulation delays. 
 	nand #1 x(wc, wa, wb) ;
 endmodule
 
@@ -21,8 +20,8 @@ endmodule
 
 module jor(input wa, input wb, output wc) ;
 	wire wic, wid ;
-	jnot n1 (wa, wic) ;
-	jnot n2 (wb, wid) ;
+	jnot n1(wa, wic) ;
+	jnot n2(wb, wid) ;
 	jnand x(wic, wid, wc) ;
 endmodule
 
@@ -37,13 +36,8 @@ module jxor(input wa, input wb, output wc) ;
 endmodule
 
 
-module jconn(input wa, output wb) ;
-	jand x(wa, wa, wb) ;
-endmodule
-
-
 module jbuf(input wa, output wb) ;
-	jconn x(wa, wb) ;
+	jand x(wa, wa, wb) ;
 endmodule
 
 
