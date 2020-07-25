@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 
 
 module jRAM (input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, output wor [7:0] bos) ;
@@ -24,6 +25,19 @@ module jRAM (input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, ou
 			end
 		end
 	endgenerate
+endmodule
+
+
+module jRAMBlock (input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, output wor [7:0] bos) ;
+	wire [7:0] busd ;
+	jregister MAR(bas, wsa, 1'b1, busd) ;
+
+	reg [7:0] RAM[0:255] ;
+	assign bos = (we) ? RAM[busd] : 0 ;
+	always @(ws) begin
+		if (ws)
+			RAM[busd] = bis ;
+	end
 endmodule
 
 

@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 
 /*
     The clock is a bit tricky as it must start high and kick off the stepper at a very specific place.

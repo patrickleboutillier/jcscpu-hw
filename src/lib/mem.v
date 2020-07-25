@@ -22,7 +22,7 @@ module jlatch(input wi, input ws, output wo) ;
 endmodule
 
 
-module jbyte(input [7:0] bis, input ws, output [7:0] bos) ;
+module jlbyte(input [7:0] bis, input ws, output [7:0] bos) ;
 	genvar j ;
 	generate
 		for (j = 0; j < 8 ; j = j + 1) begin
@@ -32,8 +32,25 @@ module jbyte(input [7:0] bis, input ws, output [7:0] bos) ;
 endmodule
 
 
-module jregister(input [7:0] bis, input ws, input we, output [7:0] bos) ;
+module jmbyte(input [7:0] bis, input ws, output [7:0] bos) ;
+	genvar j ;
+	generate
+		for (j = 0; j < 8 ; j = j + 1) begin
+			jmemory mem(bis[j], ws, bos[j]) ;
+		end
+	endgenerate
+endmodule
+
+
+module jlregister(input [7:0] bis, input ws, input we, output [7:0] bos) ;
 	wire [7:0] bus ;
-	jbyte byte(bis, ws, bus) ;
+	jlbyte byte(bis, ws, bus) ;
+	jenabler enabler(bus, we, bos) ;
+endmodule
+
+
+module jmregister(input [7:0] bis, input ws, input we, output [7:0] bos) ;
+	wire [7:0] bus ;
+	jmbyte byte(bis, ws, bus) ;
 	jenabler enabler(bus, we, bos) ;
 endmodule
