@@ -7,6 +7,5 @@ test: clean
 	./tb/tools/buildtests.sh
 	./tb/tools/runtests.sh
 
-demo: clean
-	iverilog -o out/demo.vvp src/demo/*.v src/demo.v || exit 1
-	
+demo: 
+	for e in examples/* ; do echo $$e ; ./jcscpu.sh $$e ; done

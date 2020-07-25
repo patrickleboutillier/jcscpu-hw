@@ -42,7 +42,7 @@ cat <<'V' >> /tmp/v
 
 	// RAM
     wire [7:0] ram_bus ;
-    jregister MAR(bus, ram_mar_s, 1'b1, ram_bus) ;
+    jlregister MAR(bus, ram_mar_s, 1'b1, ram_bus) ;
     reg [7:0] RAM[0:255] ;
     initial $readmemb("/tmp/mem", RAM) ;
 
@@ -66,8 +66,16 @@ cat <<'V' >> /tmp/v
 
 	always @(*) begin
 		if (halt) begin
+			$display("") ;
 			$finish ;
 		end
+	end
+
+	// Timeout
+	initial begin
+		#5000000 ;
+		$display("") ;
+		$finish ;
 	end
 
 	// Poor man's TTY. 
