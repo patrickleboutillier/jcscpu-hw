@@ -12,6 +12,7 @@ The following IO elements of the Basys-3 board are used in the demo:
 The seven-segment display shows the current demo mode. Here is the list of the demo modes:
 * mem
 * reg
+* ram
 * clk
 * step
 
@@ -47,6 +48,14 @@ LEDs are used to indicate the output values for the various components.
 * clkd = _LD2_
 * clke = _LD1_
 * clks = _LD0_
+
+### ram(BAS, BIS, s, e) => (BOS)
+"clk" provide the clock for the system. It is seeded with the FPGA system clockconnects the inputs and the outputs with a ADD circuit (page 80).
+* BAS => _SW[15:8]_
+* BIS = _SW[7:0]_
+* s = _SET_
+* e = _ENA_
+* BIS = _LD[7:0]_
 
 ### step => (O)
 "step" connects the inputs and the outputs with a CMP circuit (page 83).
