@@ -111,6 +111,57 @@ module seven_seg_word(input clk, input [31:0] word, output reg [6:0] sseg, outpu
 endmodule 
 
 
+module seven_seg_dec(input clk, input [7:0] num, output reg [6:0] sseg, output reg [3:0] an, output reg dp) ;
+    reg [7:0] led_dec ;
+    reg [19:0] count = 0 ;
+    
+    always @(posedge clk) begin
+        count <= count + 1 ;
+    end
+    
+    wire [1:0] s ;
+    assign s = count[19:18] ;
+    
+    always @(*) begin
+        case(s)
+            2'b00: begin
+                an = 4'b0111 ; 
+                led_dec = 0 ;
+            end
+            2'b01: begin
+                an = 4'b1011 ; 
+                led_dec = (num % 1000) / 100 ;
+            end
+            2'b10: begin
+                an = 4'b1101 ; 
+                led_dec = (num % 100) / 10 ;
+            end
+            2'b11: begin
+                an = 4'b1110 ; 
+                led_dec = num % 10 ;
+            end
+        endcase
+    end        
+
+    always @(*) begin       
+        dp = 1 ;
+        case(led_dec)
+            0:        sseg = 7'b1000000 ; 
+            1:        sseg = 7'b1111001 ; 
+            2:        sseg = 7'b0100100 ;
+            3:        sseg = 7'b0110000 ;
+            4:        sseg = 7'b0011001 ;
+            5:        sseg = 7'b0010010 ;
+            6:        sseg = 7'b0000010 ;
+            7:        sseg = 7'b1111000 ;
+            8:        sseg = 7'b0000000 ;
+            9:        sseg = 7'b0010000 ; 
+            default:  sseg = 7'b1111111 ; // " "
+        endcase
+    end
+endmodule 
+
+
 module genclock #(parameter HZ=1) (input clkin, output reg clkout) ;
     integer count = 0 ;
     localparam max = 100000000 / HZ ;
