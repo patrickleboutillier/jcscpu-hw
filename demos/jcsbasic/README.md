@@ -10,9 +10,9 @@ The following IO elements of the Basys-3 board are used in the demo:
 
 ## Seven-Segment Display (callout #4)
 The seven-segment display shows the current demo mode. Here is the list of the demo modes:
-* buf
-* not
+
 * nand
+* not
 * and
 * or
 * xor
@@ -36,21 +36,16 @@ LEDs are used to indicate the output values for the various components.
 
 ## Simple gates
 
-### buf(a) => (b)
-"buf" simply connects the input to the output (not in book, but is the inverse of NOT).
-* a = _SW0_
-* b = _LD0_
-
-### not(a) => (b)
-"not" connects the input and the output with a NOT circuit (page 18).
-* a = _SW0_
-* b = _LD0_
-
 ### nand(a, b) => (c)
 "nand" connects the inputs and the output with a NAND gate (page 16).
 * a = _SW1_
 * b = _SW0_
 * c = _LD0_
+
+### not(a) => (b)
+"not" connects the input and the output with a NOT circuit (page 18).
+* a = _SW0_
+* b = _LD0_
 
 ### and(a, b) => (c)
 "and" connects the inputs and the output with an AND circuit (pge 19).
