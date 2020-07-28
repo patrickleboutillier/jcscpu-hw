@@ -1,6 +1,6 @@
-# How to use the JCSCPU Basys-3 MEmory & Clock Demo
+# How to use the JCSCPU Basys-3 Memory Demo
 
-The memory and clock demo uses different modes to allow the user to try out the memory and clock components that build up the JCS CPU. 
+The memory demo uses different modes to allow the user to try out the memory components that build up the JCS CPU. 
 
 # Reference
 
@@ -13,8 +13,6 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * mem
 * reg
 * ram
-* clk
-* step
 
 ## Push buttons (callout #7)
 * _BTNU_: The top button is used to move to the previous demo mode.
@@ -23,7 +21,7 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * _BTNR_: When pressed, sets the "set" (_SET_) input to 1 for the various circuits that use it.
 
 ## Switches (_SW15_ through _SW0_) (callout #5)
-Switches are used to control the input bits to the various components. Only _SW[7:0]_ are used in this demo.
+Switches are used to control the input bits to the various components.
 
 ## LEDs (_LD15_ through _LD0_) (callout #6)
 LEDs are used to indicate the output values for the various components.
@@ -37,26 +35,16 @@ LEDs are used to indicate the output values for the various components.
 * o = _LD0_
 
 ### reg(I, s, e) => (O)
+"reg" connects the inputs and the output with an REGISTER circuit.
 * i = _SW[7:0]_
 * s = _SET_
 * e = _ENA_
 * o = _LD[7:0]_
 
-### clk => (clk, clkd, clke, clks)
-"clk" provide the clock for the system. It is seeded with the FPGA system clockconnects the inputs and the outputs with a ADD circuit (page 80).
-* clk = _LD3_
-* clkd = _LD2_
-* clke = _LD1_
-* clks = _LD0_
-
 ### ram(BAS, BIS, s, e) => (BOS)
-"clk" provide the clock for the system. It is seeded with the FPGA system clockconnects the inputs and the outputs with a ADD circuit (page 80).
+"ram" implements de system RAM. In this demo the _SET_ signal for the MAR is always on.
 * BAS => _SW[15:8]_
 * BIS = _SW[7:0]_
 * s = _SET_
 * e = _ENA_
 * BIS = _LD[7:0]_
-
-### step => (O)
-"step" connects the inputs and the outputs with a CMP circuit (page 83).
-* O = _LD[15:10]_
