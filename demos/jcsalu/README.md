@@ -29,8 +29,8 @@ Switches are used to control the input bits to the ALU. Byte A is _SW[7:0]_ and 
 ## LEDs (_LD15_ through _LD0_) (callout #6)
 LEDs are used to indicate the output values for the various components.
 * _LD15_: "carry out" (_CO_) flag.
-* _LD14_: "equal out" (_EQO_) flag.
-* _LD13_: "a-larger out" (_ALO_) flag.
+* _LD14_: "a-larger out" (_ALO_) flag.
+* _LD13_: "equal out" (_EQO_) flag.
 * _LD12_: "zero" (_Z_) flag.
 * _lD11_: Always 0.
 * _LD[10:8]_: The operation mode of the ALU (binary values 000 through 110).
