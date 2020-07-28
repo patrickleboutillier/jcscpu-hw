@@ -14,7 +14,7 @@ module jcsmem(
 	   MEM=0, REG=1, RAM=2, LAST=2 ;
     
     // Move to the next mode when nextmode is set.
-	reg [5:0] mode = MEM, nextmode = MEM ;
+	reg [3:0] mode = MEM, nextmode = MEM ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -38,18 +38,22 @@ module jcsmem(
 	wire ena_deb, set_deb ;
 	debounce setbtn(CLK, SET, set_deb) ;	
 	debounce enabtn(CLK, ENA, ena_deb) ;	
-		
+
+    wire [15:0] set_dec, ena_dec ;
+    decoder4x16 setdec(mode, set_deb, set_dec) ;		
+    decoder4x16 enadec(mode, ena_deb, ena_dec) ;
+    
     // mem
     wire mem_out ;
-    jmemory umem(SW[0], SET, mem_out) ;
+    jmemory umem(SW[0], set_dec[MEM], mem_out) ;
 
     // reg
     wire [7:0] reg_out ;
-    jmregister ureg(SW[7:0], SET, ENA, reg_out) ;    
+    jmregister ureg(SW[7:0], set_dec[REG], ena_dec[REG], reg_out) ;    
 
     // RAM
     wire [7:0] ram_out ;
-    jRAM uram(SW[15:8], 1'b1, SW[7:0], SET, ENA, ram_out) ;   
+    jRAM uram(SW[15:8], 1'b1, SW[7:0], set_dec[RAM], ena_dec[RAM], ram_out) ;   
         
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
@@ -73,4 +77,8 @@ module jcsmem(
             end
         endcase
     end
+endmodule
+
+module decoder4x16 (input [3:0] in, input en, output [15:0] out) ;
+    assign out = (en) ? (1 << in) : 16'b0 ;
 endmodule
