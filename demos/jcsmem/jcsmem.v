@@ -10,8 +10,8 @@ module jcsmem(
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
     
 	parameter 
-	   FIRST=0, 
-	   MEM=0, REG=1, RAM=2, LAST=2 ;
+	   FIRST=1, 
+	   MEM=1, REG=2, RAM=3, LAST=3 ;
     
     // Move to the next mode when nextmode is set.
 	reg [3:0] mode = MEM, nextmode = MEM ;
@@ -34,9 +34,11 @@ module jcsmem(
 
     // Aliases for push buttons
     assign SET = BTNR ;
+    assign SETA = BTNC ;
     assign ENA = BTNL ;
-	wire ena_deb, set_deb ;
+	wire ena_deb, set_deb, seta_deb ;
 	debounce setbtn(CLK, SET, set_deb) ;	
+	debounce setabtn(CLK, SETA, seta_deb) ;	
 	debounce enabtn(CLK, ENA, ena_deb) ;	
 
     wire [15:0] set_dec, ena_dec ;
@@ -74,6 +76,10 @@ module jcsmem(
                 LED[15:8] = 0 ;
                 LED[7:0] = ram_out ;
                 word = " ram" ;
+            end
+            default: begin
+                word = "    " ;
+                LED = 0 ;
             end
         endcase
     end

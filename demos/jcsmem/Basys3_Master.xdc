@@ -6,6 +6,7 @@
 ## Allow loops for gate-based memories. 
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets *]
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets */*]
+set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets */*/*]
 
 ## Clock signal
 set_property PACKAGE_PIN W5 [get_ports CLK]							
