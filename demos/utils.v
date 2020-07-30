@@ -162,19 +162,18 @@ module seven_seg_dec(input clk, input [7:0] num, output reg [6:0] sseg, output r
 endmodule 
 
 
-module genclock #(parameter HZ=1) (input clkin, output reg clkout) ;
+module genclock #(parameter HZ=1) (input clkin, output clkout) ;
     integer count = 0 ;
     localparam max = 100000000 / HZ ;
-    
+    reg rclkout = 1 ;
+	assign clkout = rclkout ;
+ 
     always @ (posedge clkin) begin
-        if (count == max - 1)
+        if (count == max - 1) begin
             count <= 0 ;
-        else
+            rclkout <= ~rclkout ;
+        end else begin
             count <= count + 1 ;
-    end
-    
-    always @ (posedge clkin) begin
-        if (count == max - 1)
-            clkout <= ~clkout ;
+        end
     end
 endmodule
