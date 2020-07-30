@@ -3,8 +3,7 @@
 
 module jRAM (input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, output wor [7:0] bos) ;
 	wire [7:0] busd ;
-	reg on = 1 ;
-	jmregister MAR(bas, wsa, on, busd) ;
+	jmregister MAR(bas, wsa, 1'b1, busd) ;
 
 	localparam n = 4 ;
 	localparam n2 = 16 ;
@@ -34,7 +33,7 @@ module jRAMBlock (input [7:0] bas, input wsa, input [7:0] bis, input ws, input w
 
 	reg [7:0] RAM[0:255] ;
 	assign bos = (we) ? RAM[busd] : 0 ;
-	always @(ws) begin
+	always @(ws or busd or bis) begin
 		if (ws)
 			RAM[busd] = bis ;
 	end
