@@ -1,6 +1,6 @@
 // `define INLEN 9
 // `define OUTLEN 8
-// jlbyte x(in[0:7], in[8], out[0:7]) ;
+// jbyte x(in[0:7], reset | in[8], out[0:7]) ;
 
 /* Output is undefined until 's' has been set once! */
 00000000_0_00000000

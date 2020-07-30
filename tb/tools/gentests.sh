@@ -24,7 +24,7 @@ for f in tb/tv/*.tv ; do
 		echo
 		cat $f | grep ^// | sed 's/^\/\//   /'
 		echo
-    	echo '    reg [0:`INLEN-1] in ;'
+    	echo '    reg [0:`INLEN-1] in = 0 ;'
 	    echo '    wire [0:`OUTLEN-1] out ;'
 		echo
 		cat tb/tools/template.v

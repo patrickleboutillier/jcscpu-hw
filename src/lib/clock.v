@@ -36,11 +36,13 @@ module jclock (input clk, input reset, output wclk, output wclkd, output wclke, 
 endmodule
 
 
-`define SMEM jlatch
+`define SMEM jmemory
 module jstepper (input clk, input reset, output [0:5] bos) ;
 	wire wrst, bos6 ;
+
 	// Loop around to wrst
-	assign wrst = bos6 ;
+	//assign wrst = bos6 ;
+	jor rst(reset, bos6, wrst) ;
 
 	wire wnrm1, wnco1, wmsn, wmsnn ;
 	jnot not1(wrst, wnrm1) ;
@@ -48,6 +50,7 @@ module jstepper (input clk, input reset, output [0:5] bos) ;
 	//jor or1(wrst, wnco1, wmsn) ;
 	assign #1 wmsn = wrst | wnco1 ;
 	jor or2(wrst, clk, wmsnn) ;
+
 
 	// M1
 	wire wn12b, wm112 ;
