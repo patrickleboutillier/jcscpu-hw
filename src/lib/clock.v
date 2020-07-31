@@ -36,7 +36,7 @@ module jclock (input clk, input reset, output wclk, output wclkd, output wclke, 
 endmodule
 
 
-`define SMEM jlatch
+`define SMEM jmemory
 module jstepper (input clk, input reset, output [0:5] bos) ;
 	wire wrst, bos6 ;
 
@@ -122,9 +122,11 @@ module jlatch(input wi, input ws, output wo) ;
 endmodule
 
 
-module jstepperb (input clk, input reset, output reg [0:5] bos) ;
+module jstepcnt (input clk, input reset, input halt, output reg [0:5] bos) ;
     always @(posedge clk)
-        if (reset || (bos == 6'b000001))
+		if (halt)
+			bos <= 6'b000000 ;
+        else if (reset || (bos == 6'b000001))
             bos <= 6'b100000 ;
         else
             bos <= bos >> 1 ;
