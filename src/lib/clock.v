@@ -36,13 +36,12 @@ module jclock (input clk, input reset, output wclk, output wclkd, output wclke, 
 endmodule
 
 
-`define SMEM jmemory
+`define SMEM jlatch
 module jstepper (input clk, input reset, output [0:5] bos) ;
 	wire wrst, bos6 ;
 
 	// Loop around to wrst
-	//assign wrst = bos6 ;
-	jor rst(reset, bos6, wrst) ;
+	assign wrst = bos6 ;
 
 	wire wnrm1, wnco1, wmsn, wmsnn ;
 	jnot not1(wrst, wnrm1) ;
@@ -51,65 +50,82 @@ module jstepper (input clk, input reset, output [0:5] bos) ;
 	assign #1 wmsn = wrst | wnco1 ;
 	jor or2(wrst, clk, wmsnn) ;
 
-
 	// M1
 	wire wn12b, wm112 ;
 	jor s1(wrst, wn12b, bos[0]) ;
-	`SMEM m1(wnrm1, wmsn, wm112) ;
+	`SMEM m1(reset ? 1'b0 : wnrm1, reset | wmsn, wm112) ;
 
 	// M12
 	wire wn12a ;
 	jnot not12(wn12a, wn12b) ;
-	`SMEM m12(wm112, wmsnn, wn12a) ;
+	`SMEM m12(reset ? 1'b0 : wm112, reset | wmsnn, wn12a) ;
 
 	// M2
 	wire wn23b, wm223 ;
 	jand s2(wn12a, wn23b, bos[1]) ;
-	`SMEM m2(wn12a, wmsn, wm223) ;
+	`SMEM m2(reset ? 1'b0 : wn12a, reset | wmsn, wm223) ;
 
 	// M23
 	wire wn23a ;
 	jnot not23(wn23a, wn23b) ;
-	`SMEM m23(wm223, wmsnn, wn23a) ;
+	`SMEM m23(reset ? 1'b0 : wm223, reset | wmsnn, wn23a) ;
 
 	// M3
 	wire wn34b, wm334 ;
 	jand s3(wn23a, wn34b, bos[2]) ;
-	`SMEM m3(wn23a, wmsn, wm334) ;
+	`SMEM m3(reset ? 1'b0 : wn23a, reset | wmsn, wm334) ;
 
 	// M34
 	wire wn34a ;
 	jnot not34(wn34a, wn34b) ;
-	`SMEM m34(wm334, wmsnn, wn34a) ;
+	`SMEM m34(reset ? 1'b0 : wm334, reset | wmsnn, wn34a) ;
 
 	// M4
 	wire wn45b, wm445 ;
 	jand s4(wn34a, wn45b, bos[3]) ;
-	`SMEM m4(wn34a, wmsn, wm445) ;
+	`SMEM m4(reset ? 1'b0 : wn34a, reset | wmsn, wm445) ;
 
 	// M45
 	wire wn45a ;
 	jnot not45(wn45a, wn45b) ;
-	`SMEM m45(wm445, wmsnn, wn45a) ;
+	`SMEM m45(reset ? 1'b0 : wm445, reset | wmsnn, wn45a) ;
 
 	// M5
 	wire wn56b, wm556 ;
 	jand s5(wn45a, wn56b, bos[4]) ;
-	`SMEM m5(wn45a, wmsn, wm556) ;
+	`SMEM m5(reset ? 1'b0 : wn45a, reset | wmsn, wm556) ;
 
 	// M56
 	wire wn56a ;
 	jnot not56(wn56a, wn56b) ;
-	`SMEM m56(wm556, wmsnn, wn56a) ;
+	`SMEM m56(reset ? 1'b0 : wm556, reset | wmsnn, wn56a) ;
 
 	// M6
 	wire wn67b, wm667 ;
 	jand s6(wn56a, wn67b, bos[5]) ;
-	`SMEM m6(wn56a, wmsn, wm667) ;
+	`SMEM m6(reset ? 1'b0 : wn56a, reset | wmsn, wm667) ;
 
 	// M67
 	jnot not67(bos6, wn67b) ;
-	`SMEM m67(wm667, wmsnn, bos6) ;
+	`SMEM m67(reset ? 1'b0 : wm667, reset | wmsnn, bos6) ;
 endmodule
 
 
+// Latch-based memory, which can yield a predictable output value.
+module jlatch(input wi, input ws, output wo) ;
+	reg ro = 0 ;
+	assign wo = ro ;
+    always @(wi or ws) begin
+        if (ws)
+            ro <= #5 wi ;
+    end
+endmodule
+
+
+module jstepperb (input clk, input reset, output reg [0:5] bos) ;
+    always @(posedge clk)
+        if (reset || (bos == 6'b000001))
+            bos <= 6'b100000 ;
+        else
+            bos <= bos >> 1 ;
+endmodule

@@ -43,7 +43,7 @@ module jcsmem(
     decoder4x16 setdec(mode, set_deb, set_dec) ;		
     decoder4x16 enadec(mode, ena_deb, ena_dec) ;
    
-    // clcwock for power-on-reset signal
+    // clock for power-on-reset signal
     wire sclk ;
 	reg reset = 1 ;
     genclock #(2) clkHZ(CLK, sclk) ;
@@ -53,11 +53,11 @@ module jcsmem(
 
     // mem
     wire mem_out ;
-    jmemory umem((reset ? 0 : SW[0]), reset | set_dec[MEM], mem_out) ;
+    jmemory umem((reset ? 1'b0 : SW[0]), reset | set_dec[MEM], mem_out) ;
 
     // reg
     wire [7:0] reg_out ;
-    jregister ureg((reset ? 0 : SW[7:0]), reset | set_dec[REG], ena_dec[REG], reg_out) ;    
+    jregister ureg((reset ? 8'b0 : SW[7:0]), reset | set_dec[REG], ena_dec[REG], reg_out) ;    
 
     // RAM
     wire [7:0] ram_out ;

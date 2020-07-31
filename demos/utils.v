@@ -165,7 +165,7 @@ endmodule
 module genclock #(parameter HZ=1) (input clkin, output clkout) ;
     integer count = 0 ;
     localparam max = 100000000 / HZ ;
-    reg rclkout = 1 ;
+    reg rclkout = 0 ;
 	assign clkout = rclkout ;
  
     always @ (posedge clkin) begin
