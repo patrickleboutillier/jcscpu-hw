@@ -1,0 +1,2 @@
+- Fix FLAGS and IAR initialization
+- MAke HALT stop the stepper
