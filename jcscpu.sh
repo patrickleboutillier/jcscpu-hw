@@ -23,7 +23,7 @@ cat <<'V' > /tmp/v
 `timescale 1ns / 1ps
 
 module jcscpu() ;
-    reg sclk, reset ;
+    reg sclk, reset = 1 ;
 
 	// generate system clock
 	always begin
@@ -31,6 +31,11 @@ module jcscpu() ;
 		#50 ;
 		sclk = 0 ;
 		#50 ;
+	end
+
+	initial begin
+		#100 ;
+		reset = 0 ;
 	end
 V
 
@@ -42,7 +47,7 @@ cat <<'V' >> /tmp/v
 
 	// RAM
     wire [7:0] ram_bus ;
-    jlregister MAR(bus, ram_mar_s, 1'b1, ram_bus) ;
+    jregister MAR(bus, ram_mar_s, 1'b1, ram_bus) ;
     reg [7:0] RAM[0:255] ;
     initial $readmemb("/tmp/mem", RAM) ;
 

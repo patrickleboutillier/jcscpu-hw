@@ -1,9 +1,9 @@
 // `define INLEN 2
 // `define OUTLEN 1
-// jmemory x(in[0], in[1], out[0]) ;
+// jmemory x(in[0], reset | in[1], out[0]) ;
 
 /* Output is undefined until 's' has been set once! */
-00_x
+00_0
 01_0
 11_1
 10_1

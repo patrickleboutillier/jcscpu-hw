@@ -8,34 +8,41 @@ wire CLK_clk, CLK_clkd, CLK_clke, CLK_clks ;
 wire [0:5] STP_bus ;
 // jstepper STP(CLK_clk, reset, STP_bus) ;
 
+reg [7:0] busi = 0 ;
 wor [7:0] bus ;
+always @(bus) begin
+	if (^bus === 1'bx)
+		busi <= 0 ;
+	else
+		busi <= bus ;
+end
 
 wire r0_s, r0_e, r1_s, r1_e, r2_s, r2_e, r3_s, r3_e ;
-jlregister r0(bus, r0_s, r0_e, bus) ;
-jlregister r1(bus, r1_s, r1_e, bus) ;
-jlregister r2(bus, r2_s, r2_e, bus) ;
-jlregister r3(bus, r3_s, r3_e, bus) ;
+jregister r0(busi, reset | r0_s, r0_e, bus) ;
+jregister r1(busi, reset | r1_s, r1_e, bus) ;
+jregister r2(busi, reset | r2_s, r2_e, bus) ;
+jregister r3(busi, reset | r3_s, r3_e, bus) ;
 
 wire tmp_s, bus1_bit1 ;
 wire [7:0] tmp_bus, bus1_bus ;
-jlregister tmp(bus, tmp_s, 1'b1, tmp_bus) ;
+jregister tmp(busi, reset | tmp_s, 1'b1, tmp_bus) ;
 jbus1 bus1(tmp_bus, bus1_bit1, bus1_bus) ;
 
 wire [2:0] alu_op ;
 wire [7:0] alu_bus ;
 wire alu_ci, alu_co, alu_eqo, alu_alo, alu_z ;
-jALU alu(bus, bus1_bus, alu_ci, alu_op, alu_bus, alu_co, alu_eqo, alu_alo, alu_z) ;
+jALU alu(busi, bus1_bus, alu_ci, alu_op, alu_bus, alu_co, alu_eqo, alu_alo, alu_z) ;
 
 wire flags_s ;
 wire [7:0] flags_in, flags_bus ;
 assign flags_in = {alu_co, alu_alo, alu_eqo, alu_z, 4'b0000} ;
-jlregister flags(flags_in, flags_s, 1'b1, flags_bus) ;
+jregister flags(flags_in, reset | flags_s, 1'b1, flags_bus) ;
 
 wire acc_s, acc_e ;
-jlregister acc(alu_bus, acc_s, acc_e, bus) ;
+jregister acc(alu_bus, reset | acc_s, acc_e, bus) ;
 
 wire alu_ena_ci, wco ;
-jlatch ctmp(flags_bus[7], tmp_s, wco) ;
+jmemory ctmp(flags_bus[7], reset | tmp_s, wco) ;
 jand cand(wco, alu_ena_ci, alu_ci) ;
 
 wire ram_mar_s, ram_s, ram_e ;
@@ -43,8 +50,8 @@ wire ram_mar_s, ram_s, ram_e ;
 
 wire iar_s, iar_e, ir_s ;
 wire [7:0] ir_bus ;
-jlregister iar(bus, iar_s, iar_e, bus) ;
-jlregister ir(bus, ir_s, 1'b1, ir_bus) ;
+jregister iar(busi, reset | iar_s, iar_e, bus) ;
+jregister ir(busi, reset | ir_s, 1'b1, ir_bus) ;
 
 wire halt ;
 wire io_s, io_e, io_da, io_io ;

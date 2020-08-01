@@ -14,7 +14,7 @@ module jcsclk(
 	   CLOCK=0, STEP=1, LAST=1 ;
     
     // Move to the next mode when nextmode is set.
-	reg [5:0] mode = CLOCK, nextmode = CLOCK ;
+	reg [5:0] mode = STEP, nextmode = STEP ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -33,13 +33,19 @@ module jcsclk(
   
 
     // clk
+	reg reset = 1 ;
     wire sclk, clk, clkd, clke, clks ;
     genclock #(2) clkHZ(CLK, sclk) ;
-    jclock localclk(sclk, 1'b0, clk, clkd, clke, clks) ;
-    
+    jclock uclk(sclk, reset, clk, clkd, clke, clks) ;
+	always @(posedge sclk) 
+        if (reset == 1) 
+			reset <= 0 ;
+			    
     // step
     wire [0:5] step_out ;
-    jstepper ustepper(clk, 1'b0, step_out) ;
+    jstepperb ustepper(clk, reset, step_out) ;
+
+    // ila_0  myila(sclk, reset, clk, clke, clks) ;
         
     // Drive the LEDs (output results), and the 7SD from the word reg.
     reg [31:0] word ;    
@@ -47,14 +53,15 @@ module jcsclk(
     always @(*) begin
         case (mode)
             CLOCK: begin
-                LED[15:4] = 0 ;
+                LED[15] = reset ;
+                LED[14:4] = 0 ;
                 LED[3:0] = {clk, clkd, clke, clks} ;
                 word = " clk" ;
             end
             STEP: begin
-                LED[15:10] = step_out ;
-                LED[9:4] = 0 ;
-                LED[3:0] = {clk, clkd, clke, clks} ;
+                LED[15:14] = {clke, clks} ;
+                LED[13:8] = step_out ;
+                LED[7:0] = 0 ;
                 word = "step" ;
             end
             default: begin
