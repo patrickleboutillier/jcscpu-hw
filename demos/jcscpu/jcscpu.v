@@ -19,8 +19,10 @@ module jcscpu(
             reset <= 0 ;
 
     wire [0:5] STP_bus ;
-    jstepcnt stp(CLK_clk, reset, halt, STP_bus) ;
+    jstepcnt stp(CLK_clk, reset, 1'b0, STP_bus) ;
 
+    wor [7:0] bus ;
+ 
     wire r0_s, r0_e, r1_s, r1_e, r2_s, r2_e, r3_s, r3_e ;
     jregister r0(bus, r0_s, r0_e, bus) ;
     jregister r1(bus, r1_s, r1_e, bus) ;
@@ -54,7 +56,7 @@ module jcscpu(
     
     wire iar_s, iar_e, ir_s ;
     wire [7:0] ir_bus ;
-    jregister iar(bus, reset | iar_s, iar_e, bus) ;
+    jregister iar(bus, iar_s, iar_e, bus) ;
     jregister ir(bus, ir_s, 1'b1, ir_bus) ;
 
     wire io_s, io_e, io_da, io_io ;
@@ -72,16 +74,18 @@ module jcscpu(
     ) ;
    
  
-    // Provide io_dev and io_data for caller.
-    reg [7:0] io_dev, io_data ;
-    always @(io_s or io_e or io_da or io_io) begin
-        if (io_s && io_da && io_io)
+    // Rudimentary IO handling for TTY
+    reg [7:0] io_dev, num = 0 ;
+    always @(io_s or io_e or io_da or io_io or bus) begin
+        if (io_s && io_da && io_io) begin
+            // Select IO address
             io_dev = bus ;
-        if (io_s && !io_da && io_io)
-            io_data = bus ;
-        //if (!io_s && !io_da && io_io)
-            // Clear reg where s is done
-        //    io_data = 0 ;
+        end
+        if (io_s && !io_da && io_io) begin
+            if (io_dev == 0) 
+                // TTY
+                num = bus ;
+        end
     end
 
 	
@@ -89,27 +93,38 @@ module jcscpu(
     wire [7:0] ram_bus ;
     jregister MAR(bus, ram_mar_s, 1'b1, ram_bus) ;
     reg [7:0] RAM[0:255] ;
-    initial $readmemb("42.mem", RAM) ;
-
     assign bus = (ram_e) ? RAM[ram_bus] : 0 ;
-    always @(ram_s) begin
+    always @(ram_s or bus or ram_bus) begin
         if (ram_s)
             RAM[ram_bus] = bus ;
     end
-
-
-	// Poor man's TTY. 
-	reg num = 0 ;
-	always @(io_dev or io_data) begin
-		if (io_dev == 0)
-			num = io_data ;
-	end
-
+    // Initialize RAM
+    initial begin
+        prog_42() ;
+    end
+   
+    
     seven_seg_dec ssd(CLK, num, SEG, AN, DP) ;
     always @(*) begin
-        LED[15:14] = {clke, clks} ;
-        LED[13:8] = step_out ;
+        LED[15:14] = {CLK_clke, CLK_clks} ;
+        LED[13:8] = STP_bus ;
 		LED[7:0] = bus ;
     end
 
+    // Program 20 + 22 = 42 ;
+    task prog_42 ; 
+        begin
+            RAM[0]  = 8'b00100000 ;
+            RAM[1]  = 8'b00010100 ;
+            RAM[2]  = 8'b00100001 ;
+            RAM[3]  = 8'b00010110 ;
+            RAM[4]  = 8'b01100000 ; // CLF because FLAGS is not properly initialized
+            RAM[5]  = 8'b10000001 ;
+            RAM[6]  = 8'b00100000 ;
+            RAM[7]  = 8'b00000000 ;
+            RAM[8]  = 8'b01111100 ;
+            RAM[9]  = 8'b01111001 ;
+            RAM[10] = 8'b01100001 ;
+        end
+    endtask
 endmodule
