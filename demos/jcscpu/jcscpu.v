@@ -9,15 +9,26 @@ module jcscpu(
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
 
-    reg reset = 1 ;
+    // Initialization and clock 
+    wire rbtn_click ;
+    click rbtn(CLK, BTNC, rbtn_click) ;
+    
+    reg reset = 1, reset_s = 1 ;
 	wire halt ;
     wire sclk, CLK_clk, CLK_clkd, CLK_clke, CLK_clks ;
-    genclock #(8) clkHZ(CLK, sclk) ;
+    genclock #(4) clkHZ(CLK, sclk) ;
     jclock CLOCK(sclk & ~halt, reset, CLK_clk, CLK_clkd, CLK_clke, CLK_clks) ;
+    // TODO: Try to merge this into a single process in order to add reset button logic.
     always @(posedge sclk)
+        if (reset_s == 1)
+            reset_s <= 0 ;
+    always @(negedge sclk)
         if (reset == 1)
             reset <= 0 ;
 
+
+    // Actual JCSCPU implementation starts here
+    
     wire [0:5] STP_bus ;
     jstepcnt STEPPER(CLK_clk, reset, STP_bus) ;
 
@@ -42,7 +53,7 @@ module jcscpu(
     wire flags_s ;
     wire [7:0] flags_in, flags_bus ;
     assign flags_in = {alu_co, alu_alo, alu_eqo, alu_z, 4'b0000} ;
-    jregister FLAGS(flags_in, flags_s, 1'b1, flags_bus) ;
+    jregister FLAGS(flags_in, reset_s | flags_s, 1'b1, flags_bus) ;
     
     wire acc_s, acc_e ;
     jregister ACC(alu_bus, acc_s, acc_e, bus) ;
@@ -56,8 +67,8 @@ module jcscpu(
     
     wire iar_s, iar_e, ir_s ;
     wire [7:0] ir_bus ;
-    jregister IAR(bus, iar_s, iar_e, bus) ;
-    jregister IR(bus, ir_s, 1'b1, ir_bus) ;
+    jregister IAR(bus, reset_s | iar_s, ~reset & iar_e, bus) ;
+    jregister IR(bus, ir_s, ~reset & 1'b1, ir_bus) ;
 
     wire io_s, io_e, io_da, io_io ;
 
@@ -77,13 +88,11 @@ module jcscpu(
     // Rudimentary IO handling for TTY
     reg [7:0] io_dev, num = 0 ;
     always @(io_s or io_e or io_da or io_io or bus) begin
-        if (io_s && io_da && io_io) begin
-            // Select IO address
+        if (io_s && io_da && io_io) begin // Select IO address
             io_dev = bus ;
         end
         if (io_s && !io_da && io_io) begin
-            if (io_dev == 0) 
-                // TTY
+            if (io_dev == 0) // TTY
                 num = bus ;
         end
     end
@@ -94,8 +103,7 @@ module jcscpu(
         if (halt)
             LED = 0 ;
         else begin
-            LED[15:14] = {CLK_clke, CLK_clks} ;
-            LED[13:8] = STP_bus ;
+            LED[15:8] = {CLK_clke, CLK_clks, STP_bus} ;
 		    LED[7:0] = bus ;
 		end
     end
