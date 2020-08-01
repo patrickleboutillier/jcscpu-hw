@@ -123,11 +123,12 @@ endmodule
 
 
 module jstepcnt (input clk, input reset, input halt, output reg [0:5] bos) ;
-    always @(posedge clk)
-		if (halt)
-			bos <= 6'b000000 ;
-        else if (reset || (bos == 6'b000001))
+    always @(posedge clk) begin
+        if (reset || bos == 6'b000001)
             bos <= 6'b100000 ;
+        else if (halt)
+            bos <= 6'b000000 ;
         else
             bos <= bos >> 1 ;
+    end
 endmodule
