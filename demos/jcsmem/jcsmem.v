@@ -34,24 +34,30 @@ module jcsmem(
 
     // Aliases for push buttons
     assign SET = BTNR ;
-    assign SETA = BTNC ;
     assign ENA = BTNL ;
-	wire ena_deb, set_deb, seta_deb ;
+	wire ena_deb, set_deb ;
 	debounce setbtn(CLK, SET, set_deb) ;	
-	debounce setabtn(CLK, SETA, seta_deb) ;	
 	debounce enabtn(CLK, ENA, ena_deb) ;	
 
     wire [15:0] set_dec, ena_dec ;
     decoder4x16 setdec(mode, set_deb, set_dec) ;		
     decoder4x16 enadec(mode, ena_deb, ena_dec) ;
-    
+   
+    // clock for power-on-reset signal
+    wire sclk ;
+	reg reset = 1 ;
+    genclock #(2) clkHZ(CLK, sclk) ;
+	always @(negedge sclk) 
+        if (reset == 1) 
+			reset <= 0 ;
+
     // mem
     wire mem_out ;
-    jmemory umem(SW[0], set_dec[MEM], mem_out) ;
+    jmemory umem((reset ? 1'b0 : SW[0]), reset | set_dec[MEM], mem_out) ;
 
     // reg
     wire [7:0] reg_out ;
-    jmregister ureg(SW[7:0], set_dec[REG], ena_dec[REG], reg_out) ;    
+    jregister ureg((reset ? 8'b0 : SW[7:0]), reset | set_dec[REG], ena_dec[REG], reg_out) ;    
 
     // RAM
     wire [7:0] ram_out ;
@@ -61,19 +67,20 @@ module jcsmem(
     reg [31:0] word ;    
     seven_seg_word ssw(CLK, word, SEG, AN, DP) ;
     always @(*) begin
+		LED[15] = reset ;
         case (mode)
             MEM: begin
-                LED[15:1] = 0 ;
+                LED[14:1] = 0 ;
                 LED[0] = mem_out ;
                 word = " mem" ;
             end
             REG: begin
-                LED[15:8] = 0 ;
+                LED[14:8] = 0 ;
                 LED[7:0] = reg_out ;
                 word = " reg" ;
             end
             RAM: begin
-                LED[15:8] = 0 ;
+                LED[14:8] = 0 ;
                 LED[7:0] = ram_out ;
                 word = " ram" ;
             end
@@ -84,6 +91,7 @@ module jcsmem(
         endcase
     end
 endmodule
+
 
 module decoder4x16 (input [3:0] in, input en, output [15:0] out) ;
     assign out = (en) ? (1 << in) : 16'b0 ;
