@@ -112,23 +112,21 @@ endmodule
 
 
 // Latch-based memory, which can yield a predictable output value.
-module jlatch(input wi, input ws, output wo) ;
-	reg ro = 0 ;
-	assign wo = ro ;
+module jlatch(input reset, input wi, input ws, output reg wo) ;
     always @(wi or ws) begin
-        if (ws)
-            ro <= #5 wi ;
+        if (reset)
+            wo <= 0 ;
+        else if (ws)
+            wo <= #5 wi ;
     end
 endmodule
 
 
-module jstepcnt (input clk, input reset, input halt, output reg [0:5] bos) ;
+module jstepcnt (input clk, input reset, output reg [0:5] bos) ;
     always @(posedge clk) begin
         if (reset || bos == 6'b000001)
             bos <= 6'b100000 ;
-        else if (halt)
-            bos <= 6'b000000 ;
-        else
+        else 
             bos <= bos >> 1 ;
     end
 endmodule
