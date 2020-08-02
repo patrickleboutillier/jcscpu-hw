@@ -27,7 +27,7 @@ The seven-segment display shows the current demo mode. Here is the list of the d
 * _BTNR_: When pressed, sets the "set" (_SET_) input to 1 for the selected component.
 
 ## Switches (_SW15_ through _SW0_) (callout #5)
-Switches are used to specify the input bits for the DATA mode, and to indicate the desired mode for the ALU.
+Switches are used to specify the input bits for the DATA mode, and to indicate the desired mode for the ALU (_SW[15:13]_).
 
 ## LEDs (_LD15_ through _LD0_) (callout #6)
 LEDs are used to indicate the output values for the various components.
@@ -61,3 +61,8 @@ LEDs are used to indicate the output values for the various components.
 ### mar
 "mar" connects _SET_ to the set wire of the MAR register.
 * s = _SET_
+
+### ram
+"ram" connects _ENA_ and _SET_ to the enable and set wire of the RAM module.
+* s = _SET_
+* e = _ENA_
