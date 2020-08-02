@@ -1,1 +1,1 @@
-- Implement reset button (click)
+- Make reset work after halt
