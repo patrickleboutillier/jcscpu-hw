@@ -251,28 +251,3 @@ module jCU (
 	jand jfand4(flags_bus[0], ir_bus[7], jfbus[3]) ;
 	jorN #(4) jfor1(jfbus, jflago) ;
 endmodule
-
-/*
-func CLFInstructions(BB *Breadboard) {
-	// DEBUG3,2,1,0, 011010[00,01,10,11]
-	for j := 0; j < 4; j++ {
-		dbg := g.NewWire()
-		g.NewANDn(g.WrapBusV(BB.GetBus("INST.bus").GetWire(6), BB.GetBus("STP.bus").GetWire(3), binst.GetWire(8+j)), dbg)
-		d := j
-		dbg.AddPrehook(func(v bool) {
-			if v {
-				BB._debug(d)
-			}
-		})
-	}
-
-	// DUMP (dump RAM)
-	dmp1 := g.NewWire()
-	g.NewANDn(g.WrapBusV(BB.GetBus("INST.bus").GetWire(6), BB.GetBus("STP.bus").GetWire(3), binst.GetWire(14)), dmp1)
-	dmp1.AddPrehook(func(v bool) {
-		if v {
-			BB.Dump()
-		}
-	})
-}
-*/
