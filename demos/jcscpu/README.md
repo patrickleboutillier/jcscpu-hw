@@ -1,6 +1,6 @@
 
 # Addition Demo
-[!(https://img.youtube.com/vi/s1U2R--A_GY/0.jpg)](https://www.youtube.com/watch?v=s1U2R--A_GY)
+[![](https://img.youtube.com/vi/s1U2R--A_GY/0.jpg)](https://www.youtube.com/watch?v=s1U2R--A_GY)
 
 # Multiplication Demo
 ![](https://img.youtube.com/vi/P00elPsVAjc/0.jpg)](https://www.youtube.com/watch?v=P00elPsVAjc)
@@ -10,3 +10,6 @@
 
 # Complete Youtube playlist
 https://www.youtube.com/playlist?list=PLYE0XunAbwfBt2wXgDHEYPtILpimne_R9
+
+
+![](https://reference.digilentinc.com/_media/basys3_hardware_walkaround.png)
