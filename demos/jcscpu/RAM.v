@@ -25,7 +25,7 @@ module ram(input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, outp
             RAM[6]  = 8'b00100001 ; // DATA  R1, 00010110 (22)
             RAM[7]  = 8'b00010110 ;
             RAM[8]  = 8'b01111001 ; // OUTD  R1
-            RAM[9] = 8'b10000001 ; // ADD   R0, R1
+            RAM[9]  = 8'b10000001 ; // ADD   R0, R1
             RAM[10] = 8'b01111001 ; // OUTD  R1
             RAM[11] = 8'b01100001 ; // HALT
         end
@@ -61,6 +61,12 @@ module ram(input [7:0] bas, input wsa, input [7:0] bis, input ws, input we, outp
             RAM[24] = 8'b01111100 ; // OUTA  R0
             RAM[25] = 8'b01111010 ; // OUTD  R2
             RAM[26] = 8'b01100001 ; // HALT
+        end
+    endtask
+    
+    task prog_none ; 
+        begin
+            RAM[0]  = 8'b01100001 ; // HALT
         end
     endtask
 endmodule

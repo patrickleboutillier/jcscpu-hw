@@ -9,26 +9,39 @@ module jcscpu(
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
 
-    // Initialization and clock 
-    wire rbtn_click ;
+    // Initialization and reset 
+	wire sclk, halt, rbtn_click ;
+    reg want_reset = 0, reset = 1, reset_s = 1 ;
     click rbtn(CLK, BTNC, rbtn_click) ;
-    
-    reg reset = 1, reset_s = 1 ;
-	wire halt ;
-    wire sclk, CLK_clk, CLK_clkd, CLK_clke, CLK_clks ;
-    genclock #(4) clkHZ(CLK, sclk) ;
-    jclock CLOCK(sclk & ~halt, reset, CLK_clk, CLK_clkd, CLK_clke, CLK_clks) ;
+    always @(posedge CLK) begin
+        if (reset)
+            want_reset <= 0 ;
+        else if (rbtn_click)
+            want_reset <= 1 ;
+    end
+
     // TODO: Try to merge this into a single process in order to add reset button logic.
-    always @(posedge sclk)
+    always @(posedge sclk) begin
+        if (want_reset)
+            reset_s <= 1 ;
         if (reset_s == 1)
             reset_s <= 0 ;
-    always @(negedge sclk)
+    end
+    always @(negedge sclk) begin
+        if (want_reset)
+            reset <= 1 ;
         if (reset == 1)
             reset <= 0 ;
+    end
 
 
     // Actual JCSCPU implementation starts here
-    
+
+
+    wire CLK_clk, CLK_clkd, CLK_clke, CLK_clks ;
+    genclock #(4) clkHZ(CLK, sclk) ;
+    jclock CLOCK(sclk, reset, CLK_clk, CLK_clkd, CLK_clke, CLK_clks) ;    
+
     wire [0:5] STP_bus ;
     jstepcnt STEPPER(CLK_clk, reset, STP_bus) ;
 
@@ -87,7 +100,7 @@ module jcscpu(
  
     // Rudimentary IO handling for TTY
     reg [7:0] io_dev, num = 0 ;
-    always @(io_s or io_e or io_da or io_io or bus) begin
+    always @(*) begin
         if (io_s && io_da && io_io) begin // Select IO address
             io_dev = bus ;
         end
@@ -95,17 +108,15 @@ module jcscpu(
             if (io_dev == 0) // TTY
                 num = bus ;
         end
+        if (reset)
+            num = 0 ;
     end
      
     
     seven_seg_dec ssd(CLK, num, SEG, AN, DP) ;
     always @(*) begin
-        if (halt)
-            LED = 0 ;
-        else begin
-            LED[15:8] = {CLK_clke, CLK_clks, STP_bus} ;
-		    LED[7:0] = bus ;
-		end
+        LED[15:8] = {CLK_clke, CLK_clks, STP_bus} ;
+		LED[7:0] = bus ;
     end
 endmodule
 
