@@ -1,3 +1,8 @@
+# JCSCPU-HW
+Hardware implementation, using a Digilent Basys-3 FPGA board, of the computer described in J. Clark Scott's book "But How Do It Know?".
+
+But How Do It Know?: http://www.buthowdoitknow.com/
+
 # Addition Demo
 [![](https://img.youtube.com/vi/s1U2R--A_GY/0.jpg)](https://www.youtube.com/watch?v=s1U2R--A_GY)
 
