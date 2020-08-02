@@ -14,7 +14,7 @@ module jcsclk(
 	   CLOCK=0, STEP=1, LAST=1 ;
     
     // Move to the next mode when nextmode is set.
-	reg [5:0] mode = STEP, nextmode = STEP ;
+	reg [5:0] mode = CLOCK, nextmode = CLOCK ;
     always @(posedge CLK) begin
         mode <= nextmode ;
     end
@@ -43,7 +43,7 @@ module jcsclk(
 			    
     // step
     wire [0:5] step_out ;
-    jstepperb ustepper(clk, reset, step_out) ;
+    jstepper ustepper(clk, reset, step_out) ;
 
     // ila_0  myila(sclk, reset, clk, clke, clks) ;
         
