@@ -1,1 +1,0 @@
-- Make reset work after halt

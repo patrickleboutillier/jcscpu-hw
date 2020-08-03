@@ -121,13 +121,11 @@ module jlatch(input reset, input wi, input ws, output reg wo) ;
 endmodule
 
 
-module jstepcnt (input clk, output [0:5] bos) ;
-    reg [0:5] rbos = 6'b100000 ;
-    assign bos = rbos ;
+module jstepcnt (input clk, input reset, output reg [0:5] bos) ;
     always @(posedge clk) begin
-        if (rbos == 6'b000001)
-            rbos <= 6'b100000 ;
+        if (reset || bos == 6'b000001)
+            bos <= 6'b100000 ;
         else 
-            rbos <= rbos >> 1 ;
+            bos <= bos >> 1 ;
     end
 endmodule
