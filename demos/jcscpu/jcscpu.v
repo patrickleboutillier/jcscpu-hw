@@ -30,17 +30,7 @@ module jcscpu (
         else if (rbtn_click)
             want_reset <= 1 ;
     end
-    
-    // Halt signal
-    wire halt ;
-    reg halted = 0 ;
-    always @(halt or reset) begin
-        if (reset)
-            halted <= 0 ;
-        else if (halt)
-            halted <= 1 ;
-    end
-    
+      
     
     // Actual JCSCPU implementation starts here
 
@@ -49,12 +39,20 @@ module jcscpu (
     jstepcnt STEPPER(CLK_clk, reset, STP_ena) ;
     assign STP_bus = (want_reset || reset || halted) ? 6'b000000 : STP_ena ;
 
-    // Reset signal, align with our computer clock.
+    // Reset and halt signals, aligned with our computer clock.
+    wire halt ;
+    reg halted = 0 ;
     always @(posedge CLK_clk) begin
-        if (want_reset && STP_ena[5])
-            reset <= 1 ;
-        else if (STP_ena[0])
+        if (reset)
             reset <= 0 ;
+        else begin
+            if (halt)
+                halted <= 1 ;
+            if (want_reset) begin
+                reset <= 1 ;
+                halted <= 0 ;
+            end
+        end
     end
         
     wor [7:0] bus ;
@@ -129,10 +127,11 @@ module jcscpu (
     
     seven_seg_dec ssd(CLK, num, SEG, AN, DP) ;
     always @(*) begin
-        LED[15:8] = {CLK_clke, CLK_clks, STP_ena} ;
+        LED[15:14] = {CLK_clke, CLK_clks} ;
+        LED[13:8] = STP_bus ;
         if (halted || want_reset || reset) begin
-          LED[7:5] = 0 ;
-          LED[4:0] = {halted, want_reset, reset, reset_e, reset_s} ;
+          LED[7:2] = 0 ;
+          LED[1:0] = {halted, want_reset} ;
         end else
 		  LED[7:0] = bus ;
     end
