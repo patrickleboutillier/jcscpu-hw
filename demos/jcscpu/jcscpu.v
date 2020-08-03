@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module jcscpu(
+module jcscpu (
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
 
@@ -18,9 +18,11 @@ module jcscpu(
         resetclk <= 0 ;
     end
     
-    // Reset
-	wire rbtn_click ;
-    reg want_reset = 0, reset = 1, reset_s = 1 ;
+    // Reset button
+    wire rbtn_click, reset_e, reset_s ;
+    reg want_reset = 0, reset = 1 ;
+    assign reset_e = reset & CLK_clke ;
+    assign reset_s = reset & CLK_clks ;
     click rbtn(CLK, BTNC, rbtn_click) ;
     always @(posedge CLK) begin
         if (reset)
@@ -29,6 +31,15 @@ module jcscpu(
             want_reset <= 1 ;
     end
 
+    // Reset signal, align with our computer clock.
+    always @(posedge CLK_clk) begin
+        if (want_reset && STP_ena[5])
+            reset <= 1 ;
+        else if (STP_ena[0])
+            reset <= 0 ;
+    end
+    
+    // Halt signal
     wire halt ;
     reg halted = 0 ;
     always @(halt or reset) begin
@@ -45,21 +56,7 @@ module jcscpu(
     wire [0:5] STP_ena, STP_bus ;
     jstepcnt STEPPER(CLK_clk, STP_ena) ;
     assign STP_bus = (want_reset || reset || halted) ? 6'b000000 : STP_ena ;
-     
-    // Aling reset with our computer clock.
-    always @(posedge CLK_clk or negedge CLK_clk) begin
-        if (CLK_clk)
-            if (want_reset && STP_ena[5]) begin
-                reset <= 1 ;
-                reset_s <= 1 ;
-            end else if (STP_ena[0])
-                reset <= 0 ;
-        else
-            if (reset_s == 1)
-                reset_s <= 0 ;
-    end
-
-
+    
     wor [7:0] bus ;
  
     wire r0_s, r0_e, r1_s, r1_e, r2_s, r2_e, r3_s, r3_e ;
@@ -81,7 +78,7 @@ module jcscpu(
     wire flags_s ;
     wire [7:0] flags_in, flags_bus ;
     assign flags_in = {alu_co, alu_alo, alu_eqo, alu_z, 4'b0000} ;
-    jregister FLAGS(flags_in, reset_s | flags_s, 1'b1, flags_bus) ;
+	jregister FLAGS(flags_in, reset_s | flags_s, 1'b1, flags_bus) ;
     
     wire acc_s, acc_e ;
     jregister ACC(alu_bus, acc_s, acc_e, bus) ;
@@ -94,9 +91,9 @@ module jcscpu(
     ram RAM(bus, ram_mar_s, bus, ram_s, ram_e, bus) ;
     
     wire iar_s, iar_e, ir_s ;
-    wire [7:0] ir_bus ;
-    jregister IAR(bus, reset_s | iar_s, ~reset & iar_e, bus) ;
-    jregister IR(bus, ir_s, ~reset & 1'b1, ir_bus) ;
+	wire [7:0] ir_bus ;
+	jregister IAR(bus, reset_s | iar_s, ~reset_e & iar_e, bus) ;
+	jregister IR(bus, ir_s, ~reset_e & 1'b1, ir_bus) ;
 
     wire io_s, io_e, io_da, io_io ;
 
