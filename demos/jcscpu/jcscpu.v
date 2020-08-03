@@ -15,6 +15,8 @@ module jcscpu (
     wire resetclk ;
     jclock CLOCK(sclk, resetclk, CLK_clk, CLK_clkd, CLK_clke, CLK_clks) ;
     wire halt, halted, want_reset, reset ;
+    assign reset_e = reset & CLK_clke ;
+    assign reset_s = reset & CLK_clks ;
     reset RESET(CLK, sclk, CLK_clk, BTNC, halt, resetclk, halted, want_reset, reset) ;
 
   
