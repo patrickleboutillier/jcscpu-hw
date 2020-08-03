@@ -10,50 +10,22 @@ module jcscpu (
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
 
     // Clock 
-    reg resetclk = 1 ;
     wire sclk, CLK_clk, CLK_clkd, CLK_clke, CLK_clks ;
     genclock #(8) clkHZ(CLK, sclk) ;
+    wire resetclk ;
     jclock CLOCK(sclk, resetclk, CLK_clk, CLK_clkd, CLK_clke, CLK_clks) ;
-    always @(negedge sclk) begin
-        resetclk <= 0 ;
-    end
-    
-    // Reset button
-    wire rbtn_click, reset_e, reset_s ;
-    reg want_reset = 0, reset = 1 ;
+    wire halt, halted, want_reset, reset ;
     assign reset_e = reset & CLK_clke ;
     assign reset_s = reset & CLK_clks ;
-    click rbtn(CLK, BTNC, rbtn_click) ;
-    always @(posedge CLK) begin
-        if (reset)
-            want_reset <= 0 ;
-        else if (rbtn_click)
-            want_reset <= 1 ;
-    end
-      
-    
+    reset RESET(CLK, sclk, CLK_clk, BTNC, halt, resetclk, halted, want_reset, reset) ;
+
+  
     // Actual JCSCPU implementation starts here
 
 
     wire [0:5] STP_ena, STP_bus ;
     jstepcnt STEPPER(CLK_clk, reset, STP_ena) ;
     assign STP_bus = (want_reset || reset || halted) ? 6'b000000 : STP_ena ;
-
-    // Reset and halt signals, aligned with our computer clock.
-    wire halt ;
-    reg halted = 0 ;
-    always @(posedge CLK_clk) begin
-        if (reset)
-            reset <= 0 ;
-        else begin
-            if (halt)
-                halted <= 1 ;
-            if (want_reset) begin
-                reset <= 1 ;
-                halted <= 0 ;
-            end
-        end
-    end
         
     wor [7:0] bus ;
  
@@ -138,3 +110,40 @@ module jcscpu (
 endmodule
 
 
+module reset(input CLK, input sclk, input CLK_clk, input BTNC, input halt, output rstclk, output hltd, output wrst, output rst) ;
+    // Clock poweron reset
+    reg resetclk = 1 ;
+    assign rstclk = resetclk ;
+    always @(negedge sclk) begin
+        resetclk <= 0 ;
+    end
+    
+    // Reset button
+    wire rbtn_click ;
+    reg want_reset = 0, reset = 1 ;
+    assign wrst = want_reset ;
+    assign rst = reset ;
+    click rbtn(CLK, BTNC, rbtn_click) ;
+    always @(posedge CLK) begin
+        if (reset)
+            want_reset <= 0 ;
+        else if (rbtn_click)
+            want_reset <= 1 ;
+    end
+    
+    // Reset and halt signals, aligned with our computer clock.
+    reg halted = 0 ;
+    assign hltd = halted ;
+    always @(posedge CLK_clk) begin
+        if (reset)
+            reset <= 0 ;
+        else begin
+            if (halt)
+                halted <= 1 ;
+            if (want_reset) begin
+                reset <= 1 ;
+                halted <= 0 ;
+            end
+        end
+    end
+endmodule
