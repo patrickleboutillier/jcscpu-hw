@@ -3,7 +3,7 @@ Hardware implementation, using a Digilent Basys-3 FPGA board, of the computer de
 
 But How Do It Know?: http://www.buthowdoitknow.com/
 
-![](https://reference.digilentinc.com/_media/basys3_hardware_walkaround.png)
+![](https://github.com/patrickleboutillier/jcscpu-hw/blob/master/schematic.jpg)
 
 
 # Addition Demo
