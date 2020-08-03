@@ -9,8 +9,17 @@ module jcscpu(
     input CLK, input [15:0] SW, input BTNU, input BTNL, input BTNC, input BTNR, input BTND,
     output reg [15:0] LED, output [6:0] SEG, output [3:0] AN, output DP) ;
 
-    // Initialization and reset 
-	wire sclk, halt, rbtn_click ;
+    // Clock 
+    reg resetclk = 1 ;
+    wire sclk, CLK_clk, CLK_clkd, CLK_clke, CLK_clks ;
+    genclock #(8) clkHZ(CLK, sclk) ;
+    jclock CLOCK(sclk, resetclk, CLK_clk, CLK_clkd, CLK_clke, CLK_clks) ;
+    always @(negedge sclk) begin
+        resetclk <= 0 ;
+    end
+    
+    // Reset
+	wire rbtn_click ;
     reg want_reset = 0, reset = 1, reset_s = 1 ;
     click rbtn(CLK, BTNC, rbtn_click) ;
     always @(posedge CLK) begin
@@ -20,30 +29,36 @@ module jcscpu(
             want_reset <= 1 ;
     end
 
-    // TODO: Try to merge this into a single process in order to add reset button logic.
-    always @(posedge sclk) begin
-        if (want_reset)
-            reset_s <= 1 ;
-        if (reset_s == 1)
-            reset_s <= 0 ;
+    wire halt ;
+    reg halted = 0 ;
+    always @(halt or reset) begin
+        if (reset)
+            halted <= 0 ;
+        else if (halt)
+            halted <= 1 ;
     end
-    always @(negedge sclk) begin
-        if (want_reset)
-            reset <= 1 ;
-        if (reset == 1)
-            reset <= 0 ;
-    end
-
-
+    
+    
     // Actual JCSCPU implementation starts here
 
 
-    wire CLK_clk, CLK_clkd, CLK_clke, CLK_clks ;
-    genclock #(4) clkHZ(CLK, sclk) ;
-    jclock CLOCK(sclk, reset, CLK_clk, CLK_clkd, CLK_clke, CLK_clks) ;    
+    wire [0:5] STP_ena, STP_bus ;
+    jstepcnt STEPPER(CLK_clk, STP_ena) ;
+    assign STP_bus = (want_reset || reset || halted) ? 6'b000000 : STP_ena ;
+     
+    // Aling reset with our computer clock.
+    always @(posedge CLK_clk or negedge CLK_clk) begin
+        if (CLK_clk)
+            if (want_reset && STP_ena[5]) begin
+                reset <= 1 ;
+                reset_s <= 1 ;
+            end else if (STP_ena[0])
+                reset <= 0 ;
+        else
+            if (reset_s == 1)
+                reset_s <= 0 ;
+    end
 
-    wire [0:5] STP_bus ;
-    jstepcnt STEPPER(CLK_clk, reset, STP_bus) ;
 
     wor [7:0] bus ;
  
@@ -108,15 +123,21 @@ module jcscpu(
             if (io_dev == 0) // TTY
                 num = bus ;
         end
-        if (reset)
+        if (reset) begin
             num = 0 ;
+            io_dev = 0 ; 
+        end
     end
      
     
     seven_seg_dec ssd(CLK, num, SEG, AN, DP) ;
     always @(*) begin
-        LED[15:8] = {CLK_clke, CLK_clks, STP_bus} ;
-		LED[7:0] = bus ;
+        LED[15:8] = {CLK_clke, CLK_clks, STP_ena} ;
+        if (halted || want_reset || reset || reset_s) begin
+          LED[7:4] = 4'b1111 ;
+          LED[3:0] = { halted, want_reset, reset, reset_s } ;
+        end else
+		  LED[7:0] = bus ;
     end
 endmodule
 
